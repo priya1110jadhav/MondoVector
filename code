@@ -132,11 +132,37 @@ for doc in documents:
 print("MongoDBAtlasVectorSearch initialized!")
 
 i have created the atlas search index named as default 
-when i ran the code again it not gives me error but gave following output 
+its json editor looks like following
+{
+  "mappings": {
+    "dynamic": true,
+    "fields": {
+      "description": {
+        "type": "string"
+      },
+      "embedding": {
+        "dimensions": 1536,
+        "similarity": "cosine",
+        "type": "knnVector"
+      },
+      "name": {
+        "type": "string"
+      }
+    }
+  }
+}
+then why my   print("+++++++++++++++++++",doc) not print and why it not answered my query question ? 
+when i ran the python file getting console output as error
+(env) PS C:\Users\PJadha04\Documents\MongoVector> python .\vector_search.py
 dbdbdbbd ['sip', 'admin', 'local']
-=============> {'_id': ObjectId('66f3dc4a769a0d499e946a79')}
-======> [SON([('v', 2), ('key', SON([('_id', 1)])), ('name', '_id_')])]
-7777777 <langchain_mongodb.vectorstores.MongoDBAtlasVectorSearch object at 0x0000025141BCA930>       
-33333333333 {'_id_': {'v': 2, 'key': [('_id', 1)]}}
-MongoDBAtlasVectorSearch initialized!
-then why my   print("+++++++++++++++++++",doc) not print and why it not answered my query question ? "give me assessment name whose name is Exp_testing"?
+Traceback (most recent call last):
+  File "C:\Users\PJadha04\Documents\MongoVector\vector_search.py", line 114, in <module>
+    documents = retriever.invoke(query)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\langchain_core\retrievers.py", line 259, in invoke
+    result = self._get_relevant_documents(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\langchain_mongodb\retrievers\hybrid_search.py", line 122, in _get_relevant_documents
+    text = res.pop(self.vectorstore._text_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'text'
