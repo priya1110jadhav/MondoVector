@@ -1,82 +1,3 @@
-import os
-
-from langchain_mongodb import MongoDBAtlasVectorSearch
-
-from pymongo import MongoClient
-
-from dotenv import load_dotenv
-
-from langchain_mongodb.retrievers.hybrid_search import MongoDBAtlasHybridSearchRetriever
-
-from langchain_openai import AzureOpenAIEmbeddings
-
-
-
-# Load environment variables
-
-load_dotenv()
-
-
-
-# Azure OpenAI configuration
-
-openai_api_type = "azure"
-
-azure_endpoint = "https://jnj-ls-rg.openai.azure.com/" # Use 'azure_endpoint' instead
-
-openai_api_version = "2023-09-15-preview"
-
-openai_api_key = "abc7a61ffc8748e885768d47d6221efe" # Replace with your actual key
-
-deployment_name = "chatembed"
-
-
-
-# Set environment variables
-
-os.environ["OPENAI_API_TYPE"] = openai_api_type
-
-os.environ["OPENAI_API_VERSION"] = openai_api_version
-
-os.environ["AZURE_OPENAI_ENDPOINT"] = azure_endpoint # Updated environment variable
-
-os.environ["OPENAI_API_KEY"] = openai_api_key
-
-
-
-# MongoDB connection
-
-MONGO_URI = os.getenv("MAIN_DB_URL")
-
-client = MongoClient(MONGO_URI)
-
-db = client.get_database()
-data = client.list_database_names()
-print("dbdbdbbd", data)
-collection = db["internal_products"] # Replace with your collection name
-
-sample_doc = collection.find_one({}, {"embedding": 1}) 
-print("=============>",sample_doc)
-smaple = collection.list_indexes()
-print("======>",list(smaple))
-
-# Initialize Azure OpenAI Embeddings with 'azure_endpoint' instead of 'openai_api_base'
-
-embeddings = AzureOpenAIEmbeddings(
-
-  azure_deployment=deployment_name,
-
-  openai_api_version=openai_api_version,
-
-  openai_api_key=openai_api_key,
-
-  azure_endpoint=azure_endpoint, # Use 'azure_endpoint'
-
-)
-
-
-
-# Initialize MongoDB Vector Search
 
 vector_search = MongoDBAtlasVectorSearch(
 
@@ -87,82 +8,14 @@ vector_search = MongoDBAtlasVectorSearch(
   index_name="default",
 
   relevance_score_fn="cosine",
+  text_key= "brandName"
 
 )
-print("7777777", vector_search)
-indexes = collection.index_information()
-print("33333333333", indexes)
-
-
-
-# Initialize the retriever
-
-retriever = MongoDBAtlasHybridSearchRetriever(
-
-  vectorstore=vector_search,
-
-  search_index_name="default",
-
-  top_k=5,
-
-  fulltext_penalty=60.0,
-
-  vector_penalty=60.0,
-
-)
-
-
-
-# Define your query
-
-query = "give me assessment name whose name is Exp_testing"
-
-
-
-# Print results
-
-documents = retriever.invoke(query)
-
-for doc in documents:
-
-  print("+++++++++++++++++++",doc)
-
-
-
-print("MongoDBAtlasVectorSearch initialized!")
-
-i have created the atlas search index named as default 
-its json editor looks like following
-{
-  "mappings": {
-    "dynamic": true,
-    "fields": {
-      "description": {
-        "type": "string"
-      },
-      "embedding": {
-        "dimensions": 1536,
-        "similarity": "cosine",
-        "type": "knnVector"
-      },
-      "name": {
-        "type": "string"
-      }
-    }
-  }
-}
-then why my   print("+++++++++++++++++++",doc) not print and why it not answered my query question ? 
-when i ran the python file getting console output as error
-(env) PS C:\Users\PJadha04\Documents\MongoVector> python .\vector_search.py
-dbdbdbbd ['sip', 'admin', 'local']
-Traceback (most recent call last):
-  File "C:\Users\PJadha04\Documents\MongoVector\vector_search.py", line 114, in <module>
-    documents = retriever.invoke(query)
-                ^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\langchain_core\retrievers.py", line 259, in invoke
-    result = self._get_relevant_documents(
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\langchain_mongodb\retrievers\hybrid_search.py", line 122, in _get_relevant_documents
-    text = res.pop(self.vectorstore._text_key)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-KeyError: 'text'
+added text_key as "brandName"
+brandName is a one of my key name from collection . it has many collection . i just added one of them 
+now i am getting output of docs as following 
++++++++++++++++++++ page_content='Acuvue' metadata={'_id': '66f3dc4a769a0d499e946a79', 'productSipId': 'SIP_ACV_0000007', 'productName': 'Alankar_Test1', 'projectId': '', 'projectName': '', 'description': 'Testing testing Testing testing Testing testing Testing testing Testing testing Testing testing Testing testing Testing testing', 'shortBrandCode': 'ACV', 'isDeleted': True, 'users': [{'name': 'Alankar', 'role': 'Owner', 'mail': 'apatil35@kenvue.com'}, {'name': 'Agharkar, Ankita Suhas [Non-Kenvue]', 'role': 'Owner', 'mail': 'AAghar01@kenvue.com'}, {'name': 'Kadam, Poonam [Non-Kenvue]', 'role': 'Owner', 'mail': 'PKadam04@kenvue.com'}, {'name': 'Babar, Rupali [Non-Kenvue]', 'role': 'Owner', 'mail': 'RBabar01@kenvue.com'}, {'name': 'Masimalai, Leela [Non-Kenvue]', 'role': 'Member', 'mail': 'LMasim01@kenvue.com'}, {'name': 'Jadhav, PriyankaY [Non-Kenvue]', 'role': 'Member', 'mail': 'PJadha04@kenvue.com'}, {'name': 'Tangalapally, Naveen Kumar [Non-Kenvue]', 'role': 'Member', 'mail': 'NTanga01@kenvue.com'}], 'createdAt': '2024-09-25T09:47:54.479000', 'updatedAt': '2024-10-21T14:18:11.985000', '__v': 0, 'assessments': {'baseline': {'assessmentId': 'SIP_ACV_0000007_001_BSL', 'name': 'Baseline', 'isFormulationDataCompleted': True, 'isPackagingDataCompleted': True, 'isFormulationCalculated': False, 'isFormulationEOLCalculated': True, 'isPackagingCalculated': True, 'fg_spec': 'FG-0047051-3', 'formula_number': 'TAB2201801A-002', 'lab_notebook_code': 'LA-004-01', 'pc_spec': 'PC-0006331, PC-0015851, PC-0016036, PC-0016086, PC-0016747, PC-0016761', 'sku_erp_code': 'PC-0006331, PC-0015851, PC-0016036, PC-0016086, PC-0016747, PC-0016761', 'zone': 'South America', 'net_content': '', 'formulation': {'fmlCode': 'TAB2201801A-002', 'description': 'Diphenhydramine HCl 5mg, Ammonium Chloride 50mg and Sodium Citrate 10mg Mint Lozenges', 'netContent': '10', 'netContentUnit': 'gm', 'productionZone': 'Brazil', 'salesZone': 'Brazil', 'productSegment': '1.2 Hair - Treat Hair', 'productSubSegment': '1.2.1 Aerosol emulsion/Foam - Leave on', 'useDose': '7.39', 'consumablesUsed': '1', 'isEdited': True, 'isCalculating': False, 'rawMaterials': [{'tradeName': 'Azul Brilhante FCF (Brilliant Blue FCF)- For Self Care Use Only', 'rawMaterialId': 'RAW92675621', 'percentage': '0.00194425308189', '_id': ObjectId('66f3dc8b769a0d499e946a91')}, {'tradeName': 'Purified Water-For Self Care Use Only', 'rawMaterialId': 'RAW92649301', 'percentage': '0.00006249383622', '_id': ObjectId('66f3dc8b769a0d499e946a92')}, {'tradeName': 'Amarelo Tartrazina (Tartrazine)- For Self Care Use Only', 'rawMaterialId': 'RAW92676181', 'percentage': '0.00194425308189', '_id': ObjectId('66f3dc8b769a0d499e946a93')}, {'tradeName': 'Neutral Ethanol - For Self Care Use Only', 'rawMaterialId': 'RAW92673544', 'percentage': '0.03194439064752', '_id': ObjectId('66f3dc8b769a0d499e946a94')}, {'tradeName': '620009 Menthol L Pellets -For self care use only', 'rawMaterialId': 'RAW92657047', 'percentage': '0.05638879149024', '_id': ObjectId('66f3dc8b769a0d499e946a95')}, {'tradeName': 'Mint Scent 100000149- For Self Care Use Only', 'rawMaterialId': 'RAW92676281', 'percentage': '0.07527764680368', '_id': ObjectId('66f3dc8b769a0d499e946a96')}, {'tradeName': 'Lemon Flavour BRO00002-For Self Care Use Only', 'rawMaterialId': 'RAW92672406', 'percentage': '0.09333317105856', '_id': ObjectId('66f3dc8b769a0d499e946a97')}, {'tradeName': 'Ammonium Chloride Extra Pure Ph Eur, BP, USP- For Self Care Use Only', 'rawMaterialId': 'RAW92675382', 'percentage': '1.38888909323613', '_id': ObjectId('66f3dc8b769a0d499e946a98')}, {'tradeName': 'Diphenhydramine Hydrochloride- For Self Care Use Only', 'rawMaterialId': 'RAW92660344', 'percentage': '0.13888891170528', '_id': ObjectId('66f3dc8b769a0d499e946a99')}, {'tradeName': 'Tri-Sodium Citrate Anhydrous Emprove Essential USP,FCC,E331- For Self Care Use Only', 'rawMaterialId': 'RAW92675249', 'percentage': '0.24388891695087003', '_id': ObjectId('66f3dc8b769a0d499e946a9a')}, {'tradeName': 'CITRIC ACID GRAN NG- For Self Care Use Only', 'rawMaterialId': 'RAW92675710', 'percentage': '0.27777782341056', '_id': ObjectId('66f3dc8b769a0d499e946a9b')}, {'tradeName': 'Ammonium Glycyrrhizate_APF-64710- For Self Care Use Only', 'rawMaterialId': 'RAW92675641', 'percentage': '0.13888891170528', '_id': ObjectId('66f3dc8b769a0d499e946a9c')}, {'tradeName': 'Sodium Saccharin (10-20mesh)- For Self Care Use Only', 'rawMaterialId': 'RAW92672221', 'percentage': '0.09666667149594001', '_id': ObjectId('66f3dc8b769a0d499e946a9d')}, {'tradeName': 'Sodium Cyclamate- For Self Care Use Only', 'rawMaterialId': 'RAW92657056', 'percentage': '0.09666667149594001', '_id': ObjectId('66f3dc8b769a0d499e946a9e')}, {'tradeName': '01064000AB Glucose Acid-GR-EL 1040-For Self Care Use Only', 'rawMaterialId': 'RAW92673045', 'percentage': '97.357438', '_id': ObjectId('66f3dc8b769a0d499e946a9f')}, {'tradeName': 'Talmag Pharma-SB- For Self Care Use Only', 'rawMaterialId': 'RAW92675086', 'percentage': '0', '_id': ObjectId('66f3dc8b769a0d499e946aa0')}], '_id': '66f3dcbb769a0d499e946b06'}, 'createdBy': 'Alankar', 'modifiedBy': '', '_id': '66f3dc8b769a0d499e946a8f', 'createdAt': '2024-09-25T09:48:59.882000', 'updatedAt': '2024-09-25T10:01:39.456000', 'packaging_level': [{'packaging_level': 'Primary', 'isrecyclable': True, 'isCalculating': False, 'recyclability_status': 'Recycle Ready', 'productEvaluation': 90, 'components': [{'pc_nm': 'PC-0002669', 'description': 'LEAFLET – 558 x 179 mm - 45 g/m² – White -  folded– tagsert', 'color': 'Blue (PET non-recyclable)', 'recyclability_status': 'Recycle Ready', 'opacity': 'Opaque', 'component_type': 'Leaflet', 'weight': '4.49', 'opacifier': 'transplant', 'stage': 'Commercial', 'state': 'Effective', 'template': 'Labels / Leaflets / Booklets', 'finishing_process': 'Acid etching, glass substrate', 'isDataComplete': True, 'isEdited': True, 'material': [{'material_name': 'Steel', 'material_type': 'PCR', 'converting_process': 'Deep drawing, steel', 'pcr_content': '100', 'material_pct': '100', 'productEnvironmentalFootPrint': '', 'carbonFootPrint': '', 'virginPlasticValue': '', '_id': ObjectId('66f3df83769a0d499e946ed4')}], '_id': ObjectId('66f3df83769a0d499e946ed3')}]}, {'packaging_level': 'Secondary', 'isrecyclable': False, 'isCalculating': False, 'recyclability_status': 'N/A', 'productEvaluation': 0, 'components': []}]}, 'final': {'assessmentId': 'SIP_ACV_0000007_002_FIN', 'name': 'Final', 'isFormulationDataCompleted': True, 'isPackagingDataCompleted': True, 'isFormulationCalculated': False, 'isFormulationEOLCalculated': True, 'isPackagingCalculated': True, 'fg_spec': 'FG-0047051-3', 'formula_number': 'TAB2201801A-002', 'lab_notebook_code': 'LA-004-01', 'pc_spec': 'PC-0006331, PC-0015851, PC-0016036, PC-0016086, PC-0016747, PC-0016761', 'sku_erp_code': 'PC-0006331, PC-0015851, PC-0016036, PC-0016086, PC-0016747, PC-0016761', 'zone': 'South America', 'net_content': '', 'formulation': {'fmlCode': 'TAB2201801A-002', 'description': 'Diphenhydramine HCl 5mg, Ammonium Chloride 50mg and Sodium Citrate 10mg Mint Lozenges', 'netContent': '11', 'netContentUnit': 'gm', 'productionZone': 'Brazil', 'salesZone': 'Brazil', 'productSegment': '1.2 Hair - Treat Hair', 'productSubSegment': '1.2.1 Aerosol emulsion/Foam - Leave on', 'useDose': '7.39', 'consumablesUsed': '1', 'isEdited': True, 'isCalculating': False, 'rawMaterials': [{'tradeName': 'Azul Brilhante FCF (Brilliant Blue FCF)- For Self Care Use Only', 'rawMaterialId': 'RAW92675621', 'percentage': '0.00194425308189', '_id': ObjectId('66f3dce4769a0d499e946b45')}, {'tradeName': 'Purified Water-For Self Care Use Only', 'rawMaterialId': 'RAW92649301', 'percentage': '0.00006249383622', '_id': ObjectId('66f3dce4769a0d499e946b46')}, {'tradeName': 'Amarelo Tartrazina (Tartrazine)- For Self Care Use Only', 'rawMaterialId': 'RAW92676181', 'percentage': '0.00194425308189', '_id': ObjectId('66f3dce4769a0d499e946b47')}, {'tradeName': 'Neutral Ethanol - For Self Care Use Only', 'rawMaterialId': 'RAW92673544', 'percentage': '0.03194439064752', '_id': ObjectId('66f3dce4769a0d499e946b48')}, {'tradeName': '620009 Menthol L Pellets -For self care use only', 'rawMaterialId': 'RAW92657047', 'percentage': '0.05638879149024', '_id': ObjectId('66f3dce4769a0d499e946b49')}, {'tradeName': 'Mint Scent 100000149- For Self Care Use Only', 'rawMaterialId': 'RAW92676281', 'percentage': '0.07527764680368', '_id': ObjectId('66f3dce4769a0d499e946b4a')}, {'tradeName': 'Lemon Flavour BRO00002-For Self Care Use Only', 'rawMaterialId': 'RAW92672406', 'percentage': '0.09333317105856', '_id': ObjectId('66f3dce4769a0d499e946b4b')}, {'tradeName': 'Ammonium Chloride Extra Pure Ph Eur, BP, USP- For Self Care Use Only', 'rawMaterialId': 'RAW92675382', 'percentage': '1.38888909323613', '_id': ObjectId('66f3dce4769a0d499e946b4c')}, {'tradeName': 'Diphenhydramine Hydrochloride- For Self Care Use Only', 'rawMaterialId': 'RAW92660344', 'percentage': '0.13888891170528', '_id': ObjectId('66f3dce4769a0d499e946b4d')}, {'tradeName': 'Tri-Sodium Citrate Anhydrous Emprove Essential USP,FCC,E331- For Self Care Use Only', 'rawMaterialId': 'RAW92675249', 'percentage': '0.24388891695087003', '_id': ObjectId('66f3dce4769a0d499e946b4e')}, {'tradeName': 'CITRIC ACID GRAN NG- For Self Care Use Only', 'rawMaterialId': 'RAW92675710', 'percentage': '0.27777782341056', '_id': ObjectId('66f3dce4769a0d499e946b4f')}, {'tradeName': 'Ammonium Glycyrrhizate_APF-64710- For Self Care Use Only', 'rawMaterialId': 'RAW92675641', 'percentage': '0.13888891170528', '_id': ObjectId('66f3dce4769a0d499e946b50')}, {'tradeName': 'Sodium Saccharin (10-20mesh)- For Self Care Use Only', 'rawMaterialId': 'RAW92672221', 'percentage': '0.09666667149594001', '_id': ObjectId('66f3dce4769a0d499e946b51')}, {'tradeName': 'Sodium Cyclamate- For Self Care Use Only', 'rawMaterialId': 'RAW92657056', 'percentage': '0.09666667149594001', '_id': ObjectId('66f3dce4769a0d499e946b52')}, {'tradeName': '01064000AB Glucose Acid-GR-EL 1040-For Self Care Use Only', 'rawMaterialId': 'RAW92673045', 'percentage': '97.357438', '_id': ObjectId('66f3dce4769a0d499e946b53')}, {'tradeName': 'Talmag Pharma-SB- For Self Care Use Only', 'rawMaterialId': 'RAW92675086', 'percentage': '0', '_id': ObjectId('66f3dce4769a0d499e946b54')}], '_id': '66f3dd05769a0d499e946bab'}, 'createdBy': 'Alankar', 'modifiedBy': '', '_id': '66f3dce4769a0d499e946b43', 'createdAt': '2024-09-25T09:50:28.403000', 'updatedAt': '2024-09-25T10:07:45.360000', 'packaging_level': [{'packaging_level': 'Primary', 'isrecyclable': True, 'isCalculating': False, 'recyclability_status': 'Recycle Ready', 'productEvaluation': 90, 'components': [{'pc_nm': 'PC-0002638', 'description': 'LABEL Front - 28,5 x 54,3 mm - White - Paper - Nicorette Lozenge 20ct', 'color': 'Gold', 'recyclability_status': 'Recycle Ready', 'opacity': 'Clear', 'component_type': 'Label', 'weight': '0.224', 'opacifier': 'transplant', 'stage': 'Commercial', 'state': 'Effective', 'template': 'Labels / Leaflets / Booklets', 'finishing_process': 'Acid etching, glass substrate', 'isDataComplete': True, 'isEdited': True, 'material': [{'material_name': 'Stainless steel', 'material_type': 'PIR', 'converting_process': 'Deep drawing, steel', 'pcr_content': '0', 'material_pct': '75', 'productEnvironmentalFootPrint': '', 'carbonFootPrint': '', 'virginPlasticValue': '', '_id': ObjectId('66f3e0f1769a0d499e947125')}, {'material_name': 'Steel', 'material_type': 'PCR', 'converting_process': 'Deep drawing, steel', 'pcr_content': '25', 'material_pct': '25', 'productEnvironmentalFootPrint': '', 'carbonFootPrint': '', 'virginPlasticValue': '', '_id': ObjectId('66f3e0f1769a0d499e947126')}], '_id': ObjectId('66f3e0f1769a0d499e947124')}]}, {'packaging_level': 'Secondary', 'isrecyclable': False, 'isCalculating': False, 'recyclability_status': 'N/A', 'productEvaluation': 0, 'components': []}]}, 'experimental': [{'assessmentId': 'SIP_ACV_0000007_003_EXP', 'name': 'Protype Shampoo PS2', 'isFormulationDataCompleted': True, 'isPackagingDataCompleted': False, 'isFormulationCalculated': True, 'isFormulationEOLCalculated': True, 'isPackagingCalculated': True, 'fg_spec': 'FG349857-01', 'formula_number': 'FML-002', 'lab_notebook_code': '000-92', 'pc_spec': 'PC-9847', 'sku_erp_code': 'SKU498765387-01', 'zone': 'Europe', 'net_content': '4 g', 'formulation': {'fmlCode': '', 'description': '', 'netContent': '4', 'netContentUnit': 'g', 'productionZone': 'Europe', 'salesZone': 'Europe', 'productSegment': '1.2 Hair - Treat Hair', 'productSubSegment': '1.2.1 Aerosol emulsion/Foam - Leave on', 'useDose': '7.39', 'consumablesUsed': '3', 'isEdited': True, 'isCalculating': False, 'rawMaterials': [{'tradeName': 'Purified Water', 'rawMaterialId': 'RAW90016347', 'percentage': '40', '_id': ObjectId('6703da32f3c9dd9e2c51da35')}, {'tradeName': 'Ajantox A - Titanium Dioxide(Anatase TiO2)', 'rawMaterialId': 'RAW90017588', 'percentage': '20', '_id': ObjectId('6708e8d441083b955455e2d1')}, {'tradeName': 'Soap Base (40:60)', 'rawMaterialId': 'RAW90017836', 'percentage': '20', '_id': ObjectId('6708e8d441083b955455e2d2')}, {'tradeName': 'Nipaguard CP', 'rawMaterialId': 'RAW90221126', 'percentage': '10', '_id': ObjectId('6708e8d441083b955455e2d3')}, {'tradeName': 'Luxsil ® AL Free', 'rawMaterialId': 'RAW92671021', 'percentage': '10', '_id': ObjectId('6708e8d441083b955455e2d4')}], '_id': ObjectId('671624e687d58ec638656204')}, 'modifiedBy': 'Ankita', '_id': ObjectId('66f3e020769a0d499e946fef'), 'updatedAt': datetime.datetime(2024, 10, 21, 9, 56, 9, 672000), 'packaging_level': [{'packaging_level': 'Primary', 'isrecyclable': False, 'isCalculating': False, 'recyclability_status': 'Non Recycle Ready', 'productEvaluation': 80, 'components': [{'pc_nm': '', 'description': '', 'color': 'Brown', 'recyclability_status': 'Recycle Ready', 'opacity': 'Transluscent', 'component_type': 'Backcard', 'weight': '2', 'opacifier': 'transplant', 'stage': '', 'state': '', 'template': '', 'finishing_process': 'Acid etching, glass substrate', 'isDataComplete': True, 'isEdited': True, 'material': [{'material_name': 'Aluminium', 'material_type': 'PCR', 'converting_process': 'Impact extrusion of aluminium', 'material_pct': '100', 'productEnvironmentalFootPrint': '', 'carbonFootPrint': '', 'virginPlasticValue': '', '_id': ObjectId('6716253987d58ec6386562de')}], '_id': ObjectId('6703daaaf3c9dd9e2c51dad2')}, {'pc_nm': '', 'description': '', 'color': '', 'recyclability_status': '', 'opacity': 'Transluscent', 'component_type': 'Can', 'weight': '', 'opacifier': '', 'stage': '', 'state': '', 'template': '', 'isDataComplete': False, 'isEdited': False, 'material': [], '_id': ObjectId('67098c67f9bde14212ff6710')}]}, {'packaging_level': 'Secondary', 'isrecyclable': False, 'isCalculating': False, 'recyclability_status': 'N/A', 'productEvaluation': 0, 'components': []}]}, {'assessmentId': 'SIP_ACV_0000007_004_EXP', 'name': 'Exp Assessment', 'isFormulationDataCompleted': False, 'isPackagingDataCompleted': False, 'isFormulationCalculated': False, 'isFormulationEOLCalculated': False, 'isPackagingCalculated': False, 'fg_spec': '', 'formula_number': '', 'lab_notebook_code': '', 'pc_spec': '', 'sku_erp_code': '', 'zone': '', 'net_content': ' g', 'formulation': {'fmlCode': '', 'description': '', 'netContent': '', 'netContentUnit': 'g', 'productionZone': '', 'salesZone': '', 'productSegment': '', 'productSubSegment': '', 'useDose': 'NaN', 'consumablesUsed': '1', 'isEdited': True, 'isCalculating': False, 'rawMaterials': [], '_id': ObjectId('6708b6a1ee1d398086858d25')}, 'packaging_level': [], 'createdBy': 'Ankita Suhas', 'modifiedBy': '', '_id': ObjectId('67066733cf7f43873c2f6774'), 'createdAt': datetime.datetime(2024, 10, 9, 11, 21, 23, 730000), 'updatedAt': datetime.datetime(2024, 10, 11, 5, 24, 49, 422000)}, {'assessmentId': 'SIP_ACV_0000007_005_EXP', 'name': 'Naveen_exp_isDataComplete', 'isFormulationDataCompleted': False, 'isPackagingDataCompleted': False, 'isFormulationCalculated': False, 'isFormulationEOLCalculated': False, 'isPackagingCalculated': False, 'fg_spec': '', 'formula_number': '', 'lab_notebook_code': '', 'pc_spec': '', 'sku_erp_code': '', 'zone': '', 'net_content': '', 'formulation': {'isEdited': False, 'isCalculating': False, '_id': ObjectId('6707ae5b6fd9d61d302af908'), 'rawMaterials': []}, 'packaging_level': [], 'createdBy': 'Naveen Kumar', 'modifiedBy': '', '_id': ObjectId('6707ae5b6fd9d61d302af909'), 'createdAt': datetime.datetime(2024, 10, 10, 10, 37, 15, 774000), 'updatedAt': datetime.datetime(2024, 10, 10, 10, 37, 15, 774000)}, {'assessmentId': 'SIP_ACV_0000007_006_EXP', 'name': 'Exp_2', 'isFormulationDataCompleted': True, 'isPackagingDataCompleted': True, 'isFormulationCalculated': True, 'isFormulationEOLCalculated': False, 'isPackagingCalculated': False, 'fg_spec': 'TV-SPEC-10001-3', 'formula_number': 'FML2057662A-001', 'lab_notebook_code': '1-30051-V027&V028-01', 'pc_spec': 'TV-SPEC-08583, TV-SPEC-54397', 'sku_erp_code': 'TV-SPEC-08583, TV-SPEC-54397', 'zone': 'United States', 'net_content': '0 g', 'formulation': {'fmlCode': '', 'description': 'Aveeno Almond Oil Blend Shampoo', 'netContent': '0', 'netContentUnit': 'g', 'productionZone': 'United States', 'salesZone': 'United States', 'productSegment': '4.1 Decorative Cosmetics - Eyes', 'productSubSegment': '4.1.1 Eyes make-up', 'useDose': '0.01', 'consumablesUsed': '1', 'isEdited': False, 'isCalculating': False, 'rawMaterials': [{'tradeName': 'Colloidal Oat Flour- For Vogue Only', 'rawMaterialId': 'RAW92635141', 'percentage': '0.0055627966792320006', '_id': ObjectId('6707aef06fd9d61d302afb04')}, {'tradeName': 'DI Water, USP - For Vogue only', 'rawMaterialId': 'RAW92645481', 'percentage': '49.054437203320774', '_id': ObjectId('6707aef06fd9d61d302afb05')}, {'tradeName': 'Sodium Citrate Dihydrate USP/FCC Granular', 'rawMaterialId': 'RAW92634962', 'percentage': '0.5', '_id': ObjectId('6707aef06fd9d61d302afb06')}, {'tradeName': 'Merquat 280 NP Polymer', 'rawMaterialId': 'RAW92634642', 'percentage': '1.3', '_id': ObjectId('6707aef06fd9d61d302afb07')}, {'tradeName': 'Hexylene Glycol -For Vogue only', 'rawMaterialId': 'RAW92635143', 'percentage': '0.5', '_id': ObjectId('6707aef06fd9d61d302afb08')}, {'tradeName': 'Carbopol Ultrez 20 copolymer-For Vogue only', 'rawMaterialId': 'RAW92635021', 'percentage': '0.1', '_id': ObjectId('6707aef06fd9d61d302afb09')}, {'tradeName': 'Caustic Soda 50%-For Vogue only', 'rawMaterialId': 'RAW92637266', 'percentage': '0.05', '_id': ObjectId('6707aef06fd9d61d302afb0a')}, {'tradeName': 'Structure PS-111-For Vogue only', 'rawMaterialId': 'RAW92636881', 'percentage': '0.5', '_id': ObjectId('6707aef06fd9d61d302afb0b')}, {'tradeName': 'ARLASILK EFA-LQ-(AP)', 'rawMaterialId': 'RAW92634502', 'percentage': '1', '_id': ObjectId('6707aef06fd9d61d302afb0c')}, {'tradeName': 'Silsense A-21 Silicone -For Vogue only', 'rawMaterialId': 'RAW92636381', 'percentage': '0.5', '_id': ObjectId('6707aef06fd9d61d302afb0d')}, {'tradeName': 'Rita Avocado Oil-For Vogue only', 'rawMaterialId': 'RAW92637827', 'percentage': '0.05', '_id': ObjectId('6707aef06fd9d61d302afb0e')}, {'tradeName': 'Citric Acid Anhydrous Fine F6000- For Vogue Only', 'rawMaterialId': 'RAW92634302', 'percentage': '0.9', '_id': ObjectId('6707aef06fd9d61d302afb0f')}, {'tradeName': 'Kalama Sodium Benzoate NF/FCC-For vogue only', 'rawMaterialId': 'RAW92636181', 'percentage': '0.5', '_id': ObjectId('6707aef06fd9d61d302afb10')}, {'tradeName': 'Euperlan PK  3000 AM-For Vogue only', 'rawMaterialId': 'RAW92636481', 'percentage': '4', '_id': ObjectId('6707aef06fd9d61d302afb11')}, {'tradeName': 'SP Versathix MBAL-LQ-(MH)-For Vogue only', 'rawMaterialId': 'RAW92635721', 'percentage': '0.99', '_id': ObjectId('6707aef06fd9d61d302afb12')}, {'tradeName': 'Merquat 3940 polymer- For vogue only', 'rawMaterialId': 'RAW92635401', 'percentage': '0.2', '_id': ObjectId('6707aef06fd9d61d302afb13')}, {'tradeName': 'TEGO BETAIN F 50- For Vogue only', 'rawMaterialId': 'RAW92635661', 'percentage': '18', '_id': ObjectId('6707aef06fd9d61d302afb14')}, {'tradeName': 'Rita Sweet Almond Oil- "For Vogue Only"', 'rawMaterialId': 'RAW92638087', 'percentage': '0.05', '_id': ObjectId('6707aef06fd9d61d302afb15')}, {'tradeName': 'Nourishing Egg White Almond T11019845 - For vogue only', 'rawMaterialId': 'RAW92637863', 'percentage': '0.8', '_id': ObjectId('6707aef06fd9d61d302afb16')}, {'tradeName': 'Bio-Terge AS 40 HP- For vogue Only', 'rawMaterialId': 'RAW92634727', 'percentage': '21', '_id': ObjectId('6707aef06fd9d61d302afb17')}], '_id': ObjectId('6707b1d26fd9d61d302b0554')}, 'packaging_level': [{'packaging_level': 'Primary', 'isrecyclable': True, 'isCalculating': False, 'recyclability_status': 'Recycle Ready', 'productEvaluation': 93, 'components': [{'pc_nm': '', 'description': 'VOGUE - Packaging Component Specification for Aveeno 12 fl oz PETG Oval 24mm Snap Bottle', 'color': 'Beige', 'recyclability_status': 'Recycle Ready', 'opacity': 'Transluscent', 'component_type': 'Bottle', 'weight': '32.5', 'opacifier': 'transplant', 'stage': 'Commercial', 'state': 'Effective', 'template': 'Bottles/ Jars', 'finishing_process': 'Acid etching, glass substrate', 'isDataComplete': True, 'isEdited': False, 'material': [{'material_name': 'Steel', 'material_type': 'PIR', 'converting_process': 'Deep drawing, steel', 'material_pct': '100', 'productEnvironmentalFootPrint': '0', 'carbonFootPrint': '0', 'virginPlasticValue': '0', '_id': ObjectId('67098c1ff9bde14212ff65a4')}], '_id': ObjectId('6707aef06fd9d61d302afb18')}]}, {'packaging_level': 'Secondary', 'isrecyclable': False, 'isCalculating': False, 'recyclability_status': 'N/A', 'productEvaluation': 0, 'components': []}], 'createdBy': 'Naveen Kumar', 'modifiedBy': '', '_id': ObjectId('6707aef06fd9d61d302afb02'), 'createdAt': datetime.datetime(2024, 10, 10, 10, 39, 44, 933000), 'updatedAt': datetime.datetime(2024, 10, 11, 20, 35, 43, 846000)}]}, 'vector_score': 0.01639344262295082, 'rank': 0, 'fulltext_score': 0, 'score': 0.01639344262295082}
+MongoDBAtlasVectorSearch initialized!
+(env) PS C:\Users\PJadha04\Documents\MongoVector>
+but it is not a exact output of my query.
+how to get a exact output that mongodb feature 'generate Query' gives to users
