@@ -1,4 +1,3 @@
-"""
 import os
 
 from langchain_mongodb import MongoDBAtlasVectorSearch
@@ -85,7 +84,7 @@ vector_search = MongoDBAtlasVectorSearch(
 
   embedding=embeddings,
 
-  index_name="vector_index",
+  index_name="default",
 
   relevance_score_fn="cosine",
 
@@ -102,7 +101,7 @@ retriever = MongoDBAtlasHybridSearchRetriever(
 
   vectorstore=vector_search,
 
-  search_index_name="vector_index",
+  search_index_name="default",
 
   top_k=5,
 
@@ -120,74 +119,24 @@ query = "give me assessment name whose name is Exp_testing"
 
 
 
-
 # Print results
 
 documents = retriever.invoke(query)
 
 for doc in documents:
 
-  print(doc)
+  print("+++++++++++++++++++",doc)
 
 
 
 print("MongoDBAtlasVectorSearch initialized!")
-"""
-above is my code and i am getting console as 
-"""
+
+i have created the atlas search index named as default 
+when i ran the code again it not gives me error but gave following output 
 dbdbdbbd ['sip', 'admin', 'local']
 =============> {'_id': ObjectId('66f3dc4a769a0d499e946a79')}
 ======> [SON([('v', 2), ('key', SON([('_id', 1)])), ('name', '_id_')])]
-7777777 <langchain_mongodb.vectorstores.MongoDBAtlasVectorSearch object at 0x0000021D82448EC0>
+7777777 <langchain_mongodb.vectorstores.MongoDBAtlasVectorSearch object at 0x0000025141BCA930>       
 33333333333 {'_id_': {'v': 2, 'key': [('_id', 1)]}}
-Traceback (most recent call last):
-  File "C:\Users\PJadha04\Documents\MongoVector\vector_search.py", line 124, in <module>
-    documents = retriever.invoke(query)
-                ^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\langchain_core\retrievers.py", line 259, in invoke
-    result = self._get_relevant_documents(
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\langchain_mongodb\retrievers\hybrid_search.py", line 117, in _get_relevant_documents
-    cursor = self.collection.aggregate(pipeline)  # type: ignore[arg-type]
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\pymongo\synchronous\collection.py", line 2978, in aggregate
-    return self._aggregate(
-           ^^^^^^^^^^^^^^^^
-  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\pymongo\_csot.py", line 119, in csot_wrapper
-    return func(self, *args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\pymongo\synchronous\collection.py", line 2886, in _aggregate
-    return self._database.client._retryable_read(
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1861, in _retryable_read
-    return self._retry_internal(
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\pymongo\_csot.py", line 119, in csot_wrapper
-    return func(self, *args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1828, in _retry_internal
-    ).run()
-      ^^^^^
-  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2565, in run
-    return self._read() if self._is_read else self._write()
-           ^^^^^^^^^^^^
-  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2708, in _read
-    return self._func(self._session, self._server, conn, read_pref)  # type: ignore
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\pymongo\synchronous\aggregation.py", line 164, in get_cursor
-    result = conn.command(
-             ^^^^^^^^^^^^^
-  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\pymongo\synchronous\helpers.py", line 47, in inner
-    return func(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\pymongo\synchronous\pool.py", line 536, in command
-    return command(
-           ^^^^^^^^
-  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\pymongo\synchronous\network.py", line 213, in command
-    helpers_shared._check_command_response(
-  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\pymongo\helpers_shared.py", line 247, in _check_command_response
-    raise OperationFailure(errmsg, code, response, max_wire_version)
-pymongo.errors.OperationFailure: PlanExecutor error during aggregation :: caused by :: Expected com.xgen.mongot.index.InitializedSearchIndex, but got instance of com.xgen.mongot.index.lucene.InitializedLuceneVectorIndex, full error: {'ok': 0.0, 'errmsg': 'PlanExecutor error during aggregation :: caused by :: Expected com.xgen.mongot.index.InitializedSearchIndex, but got instance of com.xgen.mongot.index.lucene.InitializedLuceneVectorIndex', 'code': 8, 'codeName': 'UnknownError', '$clusterTime': {'clusterTime': Timestamp(1739015435, 48), 'signature': {'hash': b'\xca|\x9a\xf1\x04\x04\xa4Vb\xbc\xb0\x01/\xbb\x07\xd0\xf6\x8b\x11\xf9', 'keyId': 7421453868283723778}}, 'operationTime': Timestamp(1739015435, 48)}
-"""
-how to solve this error
-i already created index named as vector_index and its type as vectorSearch and Index Fields as "embedding" and its status is also ready
+MongoDBAtlasVectorSearch initialized!
+then why my   print("+++++++++++++++++++",doc) not print and why it not answered my query question ? "give me assessment name whose name is Exp_testing"?
