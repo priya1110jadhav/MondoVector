@@ -1,11 +1,10 @@
-PS C:\Users\PJadha04\Documents\MongoVector> python .\vector_search.py   
-Traceback (most recent call last):
-  File "C:\Users\PJadha04\Documents\MongoVector\vector_search.py", line 26, in <module>
-    embeddings = AzureOpenAIEmbeddings(
-                 ^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\pydantic\main.py", line 214, in __init__
-    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
-                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-pydantic_core._pydantic_core.ValidationError: 1 validation error for AzureOpenAIEmbeddings
-  Value error, As of openai>=1.0.0, Azure endpoints should be specified via the `azure_endpoint` param not `openai_api_base` (or alias `base_url`).  [type=value_error, input_value={'azure_deployment': 'cha...m/', 'model_kwargs': {}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.10/v/value_error
+{
+  "fields": [
+    {
+      "type": "vector",
+      "path": "<field-name>",
+      "numDimensions": 0,
+      "similarity": "<similarity-function>"
+    }
+  ]
+}
