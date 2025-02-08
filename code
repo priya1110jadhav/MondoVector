@@ -1,0 +1,136 @@
+"""
+import os
+
+from langchain_mongodb import MongoDBAtlasVectorSearch
+
+from pymongo import MongoClient
+
+from dotenv import load_dotenv
+
+from langchain_mongodb.retrievers.hybrid_search import MongoDBAtlasHybridSearchRetriever
+# Use some embedding model to generate embeddings
+from langchain_core.embeddings import FakeEmbeddings
+from langchain.embeddings.openai import OpenAIEmbeddings
+ 
+# import openai
+openai_api_type = "azure"
+openai_api_base = "https://jnj-ls-rg.openai.azure.com/"
+openai_api_version = "2023-09-15-preview"
+openai_api_key = "i removed my key from here. but i have valid key"
+deployment_name = "chatbot35"
+from dotenv import load_dotenv
+# from app import sf
+os.environ["OPENAI_API_TYPE"] = openai_api_type
+os.environ["OPENAI_API_VERSION"] = openai_api_version
+os.environ["OPENAI_API_BASE"] = openai_api_base
+os.environ["OPENAI_API_KEY"] = openai_api_key
+
+# Load environment variables
+
+load_dotenv()
+
+
+
+MONGO_URI = os.getenv("MAIN_DB_URL")
+
+
+
+# Connect to MongoDB
+
+client = MongoClient(MONGO_URI)
+
+db = client.get_database()
+
+collection = db["internal_products"] # Replace with your collection name
+print("collection", collection)
+
+embeddings = OpenAIEmbeddings(
+     deployment="chatembed",
+                model="text-embedding-ada-002",
+                openai_api_base="https://jnj-ls-rg.openai.azure.com/",
+                openai_api_type="azure",
+                chunk_size=4,
+)
+
+# Initialize MongoDB Vector Search
+
+vector_search = MongoDBAtlasVectorSearch(collection=collection,
+embedding = embeddings,   # Embedding model to use
+   index_name = "vector_index",   
+   relevance_score_fn = "cosine" 
+)
+print("ve", vector_search)
+
+
+# Initialize the retriever
+retriever = MongoDBAtlasHybridSearchRetriever(
+   vectorstore = vector_search,  
+   search_index_name = "vector_index",  # Name of the Atlas Search index
+   top_k = 5,                           # Number of documents to return
+   fulltext_penalty = 60.0,             # Penalty for full-text search
+   vector_penalty = 60.0                # Penalty for vector search
+)
+print("####",retriever)
+# Define your query
+query = "give me assessment name whose name is Exp_testing"
+# Print results
+documents = retriever.invoke(query)
+for doc in documents:
+   print(doc)
+
+
+print("MongoDBAtlasVectorSearch initialized!")
+"""
+above is my vector_search.py
+following is my errors
+python .\vector_search.py
+C:\Users\PJadha04\Documents\MongoVector\vector_search.py:12: LangChainDeprecationWarning: Importing OpenAIEmbeddings from langchain.embeddings is deprecated. Please replace deprecated imports:
+
+>> from langchain.embeddings import OpenAIEmbeddings
+
+with new imports of:
+
+>> from langchain_community.embeddings import OpenAIEmbeddings
+You can use the langchain cli to **automatically** upgrade many imports. Please see documentation here <https://python.langchain.com/docs/versions/v0_2/>
+  from langchain.embeddings.openai import OpenAIEmbeddings
+collection Collection(Database(MongoClient(host=['ac-r8zlqni-shard-00-01.rruwsdz.mongodb.net:27017', 'ac-r8zlqni-shard-00-02.rruwsdz.mongodb.net:27017', 'ac-r8zlqni-shard-00-00.rruwsdz.mongodb.net:27017'], document_class=dict, tz_aware=False, connect=True, connecttimeoutms=15000, retrywrites=True, w='majority', authsource='admin', replicaset='atlas-79aqvs-shard-0', tls=True), 'sip'), 'internal_products')
+C:\Users\PJadha04\Documents\MongoVector\vector_search.py:46: LangChainDeprecationWarning: The class `OpenAIEmbeddings` was deprecated in LangChain 0.0.9 and will be removed in 1.0. An updated version of the class exists in the :class:`~langchain-openai package and should be used instead. To use it run `pip install -U :class:`~langchain-openai` and import as `from :class:`~langchain_openai import OpenAIEmbeddings``.
+  embeddings = OpenAIEmbeddings(
+C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\langchain_community\embeddings\openai.py:339: UserWarning: If you have openai>=1.0.0 installed and are using Azure, please use the `AzureOpenAIEmbeddings` class.
+  warnings.warn(
+ve <langchain_mongodb.vectorstores.MongoDBAtlasVectorSearch object at 0x00000258668E6A50>
+#### vectorstore=<langchain_mongodb.vectorstores.MongoDBAtlasVectorSearch object at 0x00000258668E6A50> search_index_name='vector_index' top_k=5
+Traceback (most recent call last):
+  File "C:\Users\PJadha04\Documents\MongoVector\vector_search.py", line 76, in <module>
+    documents = retriever.invoke(query)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\langchain_core\retrievers.py", line 259, in invoke        
+    result = self._get_relevant_documents(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\langchain_mongodb\retrievers\hybrid_search.py", line 67, in _get_relevant_documents
+    query_vector = self.vectorstore._embedding.embed_query(query)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\langchain_community\embeddings\openai.py", line 700, in embed_query
+    return self.embed_documents([text])[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\langchain_community\embeddings\openai.py", line 671, in embed_documents
+    return self._get_len_safe_embeddings(texts, engine=engine)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\langchain_community\embeddings\openai.py", line 497, in _get_len_safe_embeddings
+    response = embed_with_retry(
+               ^^^^^^^^^^^^^^^^^
+  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\langchain_community\embeddings\openai.py", line 120, in embed_with_retry
+    return embeddings.client.create(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\openai\resources\embeddings.py", line 125, in create      
+    return self._post(
+           ^^^^^^^^^^^
+  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\openai\_base_client.py", line 1283, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\openai\_base_client.py", line 960, in request
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "C:\Users\PJadha04\Documents\MongoVector\env\Lib\site-packages\openai\_base_client.py", line 1064, in _request
+    raise self._make_status_error_from_response(err.response) from None
+openai.NotFoundError: Error code: 404 - {'error': {'code': '404', 'message': 'Resource not found'}}
