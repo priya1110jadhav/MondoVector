@@ -1,22 +1,14 @@
 import os
 
-from langchain_mongodb import MongoDBAtlasVectorSearch
-
 from pymongo import MongoClient
 
 from dotenv import load_dotenv
 
-from langchain_mongodb.retrievers.hybrid_search import MongoDBAtlasHybridSearchRetriever
-
 from langchain_openai import AzureOpenAIEmbeddings
-
-
 
 # Load environment variables
 
 load_dotenv()
-
-
 
 # Azure OpenAI configuration
 
@@ -30,8 +22,6 @@ openai_api_key = "abc7a61ffc8748e885768d47d6221efe" # Replace with your actual k
 
 deployment_name = "chatembed"
 
-
-
 # Set environment variables
 
 os.environ["OPENAI_API_TYPE"] = openai_api_type
@@ -42,8 +32,6 @@ os.environ["AZURE_OPENAI_ENDPOINT"] = azure_endpoint # Updated environment varia
 
 os.environ["OPENAI_API_KEY"] = openai_api_key
 
-
-
 # MongoDB connection
 
 MONGO_URI = os.getenv("MAIN_DB_URL")
@@ -51,10 +39,8 @@ MONGO_URI = os.getenv("MAIN_DB_URL")
 client = MongoClient(MONGO_URI)
 
 db = client.get_database()
-data = client.list_database_names()
-print("dbdbdbbd", data)
-collection = db["internal_products"] # Replace with your collection name
 
+collection = db["internal_products"] # Replace with your collection name
 
 # Initialize Azure OpenAI Embeddings with 'azure_endpoint' instead of 'openai_api_base'
 
@@ -70,60 +56,92 @@ embeddings = AzureOpenAIEmbeddings(
 
 )
 
+# Function to generate embeddings for a query
 
+def generate_embedding(query):
 
-# Initialize MongoDB Vector Search
+  return embeddings.embed_query(query)
 
-vector_search = MongoDBAtlasVectorSearch(
+# Function to perform vector search using $vectorSearch operator
 
-  collection=collection,
+def vector_search_query(query_embedding, collection, index_name="vector_index", limit=5):
 
-  embedding=embeddings,
+  pipeline = [
 
-  index_name="default",
+    {
 
-  relevance_score_fn="cosine",
-  text_key= "brandName"
+      "$vectorSearch": {
 
-)
-# Initialize the retriever
+        "index": index_name,
 
-retriever = MongoDBAtlasHybridSearchRetriever(
+        "path": "embedding", # Replace with the actual field name storing the vector
 
-  vectorstore=vector_search,
+        "queryVector": query_embedding,
 
-  search_index_name="default",
+        "numCandidates": 100,
 
-  top_k=5,
+        "limit": limit,
 
-  fulltext_penalty=60.0,
+        "type": "knnVector"
 
-  vector_penalty=60.0,
+      }
 
-)
+    },
+
+    {
+
+      "$project": {
+
+        "_id": 1,
+
+        "brandName": 1, # Replace with the fields you want to return
+
+        "score": {"$meta": "vectorSearchScore"},
+
+      }
+
+    },
+
+  ]
+
+  print("collection.aggregate(pipeline)", collection.aggregate(pipeline))
+
+  return list(collection.aggregate(pipeline))
 
 
 
 # Define your query
 
-query = "give me assessment name whose name is Exp_testing"
+query = "give me document whose zone is South America"
+
+# Generate embeddings for the query
+
+query_embedding = generate_embedding(query)
 
 
+
+# Perform vector search using the generated embeddings
+
+results = vector_search_query(query_embedding, collection)
+
+print("results", results)
 
 # Print results
 
-documents = retriever.invoke(query)
+for doc in results:
 
-for doc in documents:
-
-  print("+++++++++++++++++++",doc)
-
-
+  print("+++++++++++++++++++", doc)
 
 print("MongoDBAtlasVectorSearch initialized!")
 
-consider abobe code here i need to achieve following as
-1. my above code is successfully connected with mongodb atlas using given string.
-2) when user inputs Natural Language question in query , generate embeddings vector for that query.
-3) use $vectorSearch operator in aggregation pipeline to search the 'internal_products' collection using generated vector and the existing 'vector_search' index
-4) return the relevant documents from collection
+
+
+when i console that time why my result is empty
+
+collection.aggregate(pipeline) <pymongo.synchronous.command_cursor.CommandCursor object at 0x000001C2070B91C0>
+
+results []
+
+MongoDBAtlasVectorSearch initialized!
+
+why this happening?
