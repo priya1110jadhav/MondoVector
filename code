@@ -1,19 +1,4 @@
-https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-overview/
-
-consider above reference link 
-This above link having the modules like 
-Quick start
-Create embeddings
-Create and manage Indexes
-Vector quantization
-RAG
-
-take a reference from above documentation and I need to create a python program where user can saerch with natural language and I have mongoDB atlas cluster and having atlas search index as 'vector_index'
-and my cocnnection string as following
-MAIN_DB_URL="mongodb+srv://Priyanka:d9IbiZ2k9Urx2kUr@cluster0.h4mly.mongodb.net/sip?retryWrites=true&w=majority&appName=Cluster0"
-
-and my collection named as "internal_products'
-
-in above collection i need to create vector atlas search when i ask any question on this collection it will create or generate the query and fire on the collection and retrieve the collection result and displayed to user.
-could you please write a program which fulfil my requirement .
-so it will work as 'Generate Query' feature of mongodb 
+             ^^^^^^^^^^^^^^
+  File "C:\Users\PJadha04\OneDrive - Kenvue\Documents\vectorMongodb\env\Lib\site-packages\openai\_client.py", line 110, in __init__        
+    raise OpenAIError(
+openai.OpenAIError: The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable
