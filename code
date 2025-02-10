@@ -1,4 +1,9 @@
-             ^^^^^^^^^^^^^^
-  File "C:\Users\PJadha04\OneDrive - Kenvue\Documents\vectorMongodb\env\Lib\site-packages\openai\_client.py", line 110, in __init__        
-    raise OpenAIError(
-openai.OpenAIError: The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable
+# Azure OpenAI configuration
+
+openai_api_type = "azure"
+
+azure_endpoint = "https://jnj-ls-rg.openai.azure.com/" # Use 'azure_endpoint' instead
+
+openai_api_version = "2023-09-15-preview"
+
+openai_api_key = "abc7a61ffc8748e885768d47d6221efe" # Replace with your actual key
