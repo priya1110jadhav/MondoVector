@@ -6,4 +6,6 @@ azure_endpoint = "https://jnj-ls-rg.openai.azure.com/" # Use 'azure_endpoint' in
 
 openai_api_version = "2023-09-15-preview"
 
-openai_api_key = "abc7a61ffc8748e885768d47d6221efe" # Replace with your actual key
+openai_api_key = "abc7a61ffc8748e885768d47d6221efe"
+
+deployment_name = "chatembed"
