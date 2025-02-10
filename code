@@ -1,3 +1,23 @@
+import os
+
+from langchain_mongodb import MongoDBAtlasVectorSearch
+
+from pymongo import MongoClient
+
+from dotenv import load_dotenv
+
+from langchain_mongodb.retrievers.hybrid_search import MongoDBAtlasHybridSearchRetriever
+
+from langchain_openai import AzureOpenAIEmbeddings
+
+
+
+# Load environment variables
+
+load_dotenv()
+
+
+
 # Azure OpenAI configuration
 
 openai_api_type = "azure"
@@ -6,6 +26,104 @@ azure_endpoint = "https://jnj-ls-rg.openai.azure.com/" # Use 'azure_endpoint' in
 
 openai_api_version = "2023-09-15-preview"
 
-openai_api_key = "abc7a61ffc8748e885768d47d6221efe"
+openai_api_key = "abc7a61ffc8748e885768d47d6221efe" # Replace with your actual key
 
 deployment_name = "chatembed"
+
+
+
+# Set environment variables
+
+os.environ["OPENAI_API_TYPE"] = openai_api_type
+
+os.environ["OPENAI_API_VERSION"] = openai_api_version
+
+os.environ["AZURE_OPENAI_ENDPOINT"] = azure_endpoint # Updated environment variable
+
+os.environ["OPENAI_API_KEY"] = openai_api_key
+
+
+
+# MongoDB connection
+
+MONGO_URI = os.getenv("MAIN_DB_URL")
+
+client = MongoClient(MONGO_URI)
+
+db = client.get_database()
+data = client.list_database_names()
+print("dbdbdbbd", data)
+collection = db["internal_products"] # Replace with your collection name
+
+
+# Initialize Azure OpenAI Embeddings with 'azure_endpoint' instead of 'openai_api_base'
+
+embeddings = AzureOpenAIEmbeddings(
+
+  azure_deployment=deployment_name,
+
+  openai_api_version=openai_api_version,
+
+  openai_api_key=openai_api_key,
+
+  azure_endpoint=azure_endpoint, # Use 'azure_endpoint'
+
+)
+
+
+
+# Initialize MongoDB Vector Search
+
+vector_search = MongoDBAtlasVectorSearch(
+
+  collection=collection,
+
+  embedding=embeddings,
+
+  index_name="default",
+
+  relevance_score_fn="cosine",
+  text_key= "brandName"
+
+)
+# Initialize the retriever
+
+retriever = MongoDBAtlasHybridSearchRetriever(
+
+  vectorstore=vector_search,
+
+  search_index_name="default",
+
+  top_k=5,
+
+  fulltext_penalty=60.0,
+
+  vector_penalty=60.0,
+
+)
+
+
+
+# Define your query
+
+query = "give me assessment name whose name is Exp_testing"
+
+
+
+# Print results
+
+documents = retriever.invoke(query)
+
+for doc in documents:
+
+  print("+++++++++++++++++++",doc)
+
+
+
+print("MongoDBAtlasVectorSearch initialized!")
+
+consider abobe code here i need to achieve following as
+1. my above code is successfully connected with mongodb atlas using given string.
+2) when user inputs Natural Language question in query , generate embeddings vector for that query.
+3) use $vectorSearch operator in aggregation pipeline to search the 'internal_products' collection using generated vector and the existing 'vector_search' index
+4) return the relevant documents from collection
