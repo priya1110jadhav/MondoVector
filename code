@@ -4,10 +4,10 @@ const flipIconImage =am5.Picture.new(root, {
       height: 20,
       marginLeft: 5,
       centerY: am5.p50,
-      tooltipText: "Click on the dials to flip",
-      showTooltipOn: "hover"
+      interactive: true,
+     cursorOverStyle: "pointer"
     });
-    titleContainer.children.push(flipIconImage);
+   
     // Tooltip for flip icon
     const flipIconTooltip = am5.Tooltip.new(root, {
       labelText: "Click on the dial to flip",
@@ -29,6 +29,8 @@ const flipIconImage =am5.Picture.new(root, {
       paddingLeft: 20,
     });
     flipIconImage.set("tooltip", flipIconTooltip);
+
+    titleContainer.children.push(flipIconImage);
 
 i am using am5 chart.
 here i am showing tooltip on hover of flipIcon image . but tooltip is not displaying 
