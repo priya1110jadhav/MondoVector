@@ -178,40 +178,32 @@ if (props.sub_title === "Good" || props.sub_title === "Excellent") {
     };
   }, [props,imageSrc]);
 
-  return (
 
-    <label>
-    <span className="visually-hidden">Flip card</span>
-    <input type="checkbox" id="flipcardCheckbox" name="flipcardCheckbox" />
-    <div className="flip-card">
-      <div className="flip-card-inner">
-        <div className="flip-card-front">
-          <div
-            id={`chartdiv_${props.chartDivIndex}`}
-            className="pieChartdiv"
-            style={{
-              border:
-                props.selectedpiechart === "selected"
-                  ? "2px solid #000"
-                  : "1px solid #B4B4B4",
-            }}
-          ></div>
-        </div>
-        <div
-          className="flip-card-back"
-          style={{
-            border:
-              props.selectedpiechart === "selected"
-                ? "2px solid #000"
-                : "1px solid #B4B4B4",
-          }}
-        >
-          <props.flipcard_description />
-        </div>
-      </div>
-    </div>
-  </label>
-  
-  );
 }
 export default PieChartDials;
+
+my requirement
+1) here where  text: `${props.title}`, displayed on the same line i want to display my {flipIcon}
+both are aligned in same row.
+when text: `${props.title}` is huge then we have to break the text in next row . and it should be center .
+ {flipIcon} is aligned to right of text
+
+2) when we hover on  {flipIcon} that time tooltip is displayed and show texta as: "Click on the dial to flip" 
+and tooltip has following style
+width: 192;
+height: 44;
+border-radius: 8px;
+gap: 10px;
+padding-top: 12px;
+padding-right: 20px;
+padding-bottom: 12px;
+padding-left: 20px;
+background: #000000;
+and its text css as following
+font-family: Kenvue Sans;
+font-weight: 400;
+font-size: 13.33px;
+line-height: 19.99px;
+letter-spacing: 0%;
+color: #F8F8F8;
+
