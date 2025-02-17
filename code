@@ -1,10 +1,13 @@
-const flipIconImage = titleContainer.children.push(am5.Picture.new(root, {
+const flipIconImage =am5.Picture.new(root, {
       src: flipIcon,
       width: 20,
       height: 20,
       marginLeft: 5,
       centerY: am5.p50,
-    }));
+      tooltipText: "Click on the dials to flip",
+      showTooltipOn: "hover"
+    });
+    titleContainer.children.push(flipIconImage);
     // Tooltip for flip icon
     const flipIconTooltip = am5.Tooltip.new(root, {
       labelText: "Click on the dial to flip",
@@ -29,4 +32,5 @@ const flipIconImage = titleContainer.children.push(am5.Picture.new(root, {
 
 i am using am5 chart.
 here i am showing tooltip on hover of flipIcon image . but tooltip is not displaying 
-how to achieve this tooltip on image by hover 
+how to achieve this tooltip on image by hover .
+please refer the am5 documentation to show tooltip on image while hovering
