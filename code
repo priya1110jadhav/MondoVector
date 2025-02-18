@@ -1,282 +1,31 @@
-import React from "react";
-import * as am5 from "@amcharts/amcharts5";
-import * as am5percent from "@amcharts/amcharts5/percent";
-import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
-import great_job from "../../assets/images/great_job.svg";
-import warning_dials from "../../assets/images/warning_dials.svg";
-import { PieChartDialsProps } from "../breadcrumb/types";
-import "../../assets/css/ProductAssessment.scss";
-import flipIcon from "../../assets/images/FLIP CARD.svg"
-const PieChartDials: React.FC<PieChartDialsProps> = (props: PieChartDialsProps) => {
-  let imageSrc = "";
-if (props.sub_title === "Good" || props.sub_title === "Excellent") {
-  imageSrc = great_job;
-} else if (props.sub_title === "Poor" || props.sub_title === "Very poor") {
-  imageSrc = warning_dials;
-} else {
-  imageSrc = "";
+.tooltip {
+  visibility: hidden;
+  z-index: 9999 !important;
+  width: 192px;
+  height: 44px;
+  gap: 10px;
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: #000000;
+  color: #F8F8F8;
+  font-family: "kenvue-sans-regular",sans-serif;
+  font-weight: 400;
+  font-size: 13.33px;
+  line-height: 19.99px;
+  letter-spacing: 0%;
+  position: absolute;
+  bottom: 74%;
+  left: 70%;
+  transform: translateX(-50%);
+  transition: visibility 0s, opacity 0.2s ease;
+  opacity: 0;
 }
-  React.useLayoutEffect(() => {
-    const data_series0 = props.data_series0;
-    const data_series1 = props.data_series1;
+this is my tooltip but  i want to design as it will show as notch at botttom in center i will show you as following
+i created it using the keyboard for showing you how it will look 
+in bottom middle we need a 'V' shape . hopw you understood please shape above tooltip
 
-    const root = am5.Root.new(`chartdiv_${props.chartDivIndex}`);
+ ______________________
+|                      |
+|___________  _________|
+            \/
 
-    root.setThemes([
-      am5themes_Animated.new(root)
-    ]);
-    root._logo?.dispose();
-    const chart = root.container.children.push(
-      am5percent.PieChart.new(root, {
-        startAngle: 180, endAngle: 360
-      })
-    );
-
-    // Create a container for the title and flip icon
-    const titleContainer = chart.children.unshift(am5.Container.new(root, {
-      x: am5.percent(50),
-      centerX: am5.percent(50),
-      y: 45,
-      layout: root.horizontalLayout,
-      // verticalCenter: "middle",
-    }));
-    // Add title label with text wrapping
-    const titleLabel = titleContainer.children.push(am5.Label.new(root, {
-      text: `${props.title}`,
-      fontSize: 12,
-      fontWeight: "400",
-      fontFamily: "kenvue-sans",
-      fill: am5.color("#2B2B2B"),
-      textAlign: "center",
-      oversizedBehavior: "wrap",// textWrap: true,
-      maxWidth: 200, // Adjust based on your needs
-      centerY: am5.p50,
-    }));
-    titleContainer.children.push(titleLabel);
-    // Add flip icon
-    const flipIconImage =am5.Picture.new(root, {
-      src: flipIcon,
-      width: 20,
-      height: 20,
-      marginLeft: 5,
-      centerY: am5.p50,
-      interactive: true,
-      cursorOverStyle: "pointer",
-
-     
-    });
-    titleContainer.children.push(flipIconImage);
-  
-    // Tooltip for flip icon
-    const flipIconTooltip = am5.Tooltip.new(root, {
-      labelText: "Click on the dial to flip",
-      autoTextColor: false,
-
-    });
-    flipIconTooltip.get("background").setAll({
-      fill: am5.color("#000000"),
-      fillOpacity: 1,
-    });
-    flipIconTooltip.label.setAll({
-      fontFamily: "kenvue-sans",
-      fontSize: 13.33,
-      fontWeight: "400",
-      fill: am5.color("#F8F8F8"),
-      lineHeight: 19.99,
-      paddingTop: 12,
-      paddingRight: 20,
-      paddingBottom: 12,
-      paddingLeft: 20,
-      layer: 10,
-    });
-    flipIconImage.set("tooltip", flipIconTooltip);
-    
-
-    chart.children.unshift(am5.Label.new(root, {
-      text: `${props.sub_title}`,
-      fontSize: 23,
-      fontWeight: "700",
-      textAlign: "center",
-      fontFamily: "kenvue-sans",
-      x: am5.percent(50),
-      centerX: am5.percent(50),
-      y: am5.percent(75),
-      centerY: am5.percent(75),
-      paddingBottom: 0
-    }));
-
-    chart.children.unshift(am5.Picture.new(root, {
-      width: 32,
-      height: 32,
-      src: imageSrc,
-      y: am5.percent(90),
-      centerY: am5.percent(90),
-      x: am5.percent(50),
-      centerX: am5.percent(50),
-      marginBottom: 29.12,
-    }));
-
-    const series0 = chart.series.push(
-      am5percent.PieSeries.new(root, {
-        valueField: "rangeIndicator",
-        categoryField: "dialsIndicator",
-        legendLabelText: "actaulRangeIndicator",
-        startAngle: 180,
-        endAngle: 360,
-        radius: am5.percent(60),
-        innerRadius: am5.percent(47),
-        y: am5.percent(-5),
-      })
-    );
-
-    const tooltip_series0 = am5.Tooltip.new(root, {
-      labelText: "[bold]{dialsIndicator}: {actaulRangeIndicator}"
-    });
-
-    series0.set("tooltip", tooltip_series0);
-
-    const assignedColors = (numberOfColors: number) => {
-      const colors = [];
-      for (let i = 0; i < numberOfColors; i++) {
-        const color = data_series0[i].colors;
-        // Validate and check if color is present and in the right format
-        if (color && /^#([0-9A-F]{3}){1,2}$/i.test(color)) {
-          colors.push(am5.color(color));
-        } else {
-          // Use a default color if the color is invalid or missing
-          colors.push(am5.color("#000000")); // Fallback color
-        }
-      }
-      return colors;
-    };
-
-    const chartColors = assignedColors(data_series0 ? data_series0.length : 0);
-
-    const colorSet = am5.ColorSet.new(root, {
-      colors: chartColors,
-      passOptions: {
-        lightness: -0.05,
-        hue: 0
-      }
-    });
-
-    series0.set("colors", colorSet);
-    series0.ticks.template.set("forceHidden", true);
-    series0.labels.template.set("forceHidden", true);
-    series0.slices.template.set("toggleKey", "none");
-
-    const series1 = chart.series.push(
-      am5percent.PieSeries.new(root, {
-        startAngle: 180,
-        endAngle: 360,
-        valueField: "rangeIndicator",
-        innerRadius: am5.percent(70),
-        categoryField: "dialsIndicator",
-        legendLabelText: "actaulRangeIndicator",
-        y: am5.percent(-5),
-      })
-    );
-
-    const tooltip_series1 = am5.Tooltip.new(root, {
-      labelText: "[bold]{dialsIndicator}: {actaulRangeIndicator}"
-    });
-
-    series1.set("tooltip", tooltip_series1);
-
-    const assignedColorsSeries1 = (numberOfColors: number) => {
-      const colors = [];
-      for (let i = 0; i < numberOfColors; i++) {
-        const color = data_series1[i].colors_series1;
-        // Validate and check if color is present and in the right format
-        if (color && /^#([0-9A-F]{3}){1,2}$/i.test(color)) {
-          colors.push(am5.color(color));
-        } else {
-          // Use a default color if the color is invalid or missing
-          colors.push(am5.color("#000000")); // Fallback color
-        }
-      }
-      return colors;
-    };
-
-    const chartColorsSeries1 = assignedColorsSeries1(data_series1 ? data_series1.length : 0);
-
-    const colorSetSeries1 = am5.ColorSet.new(root, {
-      colors: chartColorsSeries1,
-      passOptions: {
-        lightness: -0.05,
-        hue: 0
-      }
-    });
-
-    series1.set("colors", colorSetSeries1);
-
-    series1.ticks.template.set("forceHidden", true);
-    series1.labels.template.set("forceHidden", true);
-    series1.slices.template.set("toggleKey", "none");
-
-    const showPercentage = (props.title !== 'Sustainable Packaging'&& props.title!=="Green Chemistry") ? "%":"";
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    chart.seriesContainer.children.push(
-      am5.Label.new(root, {
-        textAlign: "center",
-        centerY: am5.percent(100),
-        centerX: am5.p50,
-        text: `\n[bold fontSize:16px]${(props.pie_chart_percentage === 'N/A') ? props.pie_chart_percentage : (props.pie_chart_percentage + showPercentage)}[/]`
-      })
-    );
-  
-    series0.data.setAll(data_series0 || []);
-    series1.data.setAll(data_series1 || []);
-
-    return () => {
-      root.dispose();
-    };
-  }, [props,imageSrc]);
-
-  return (
-
-    <label>
-    <span className="visually-hidden">Flip card</span>
-    <input type="checkbox" id="flipcardCheckbox" name="flipcardCheckbox" />
-    <div className="flip-card">
-      <div className="flip-card-inner">
-        <div className="flip-card-front">
-          <div
-            id={`chartdiv_${props.chartDivIndex}`}
-            className="pieChartdiv"
-            style={{
-              border:
-                props.selectedpiechart === "selected"
-                  ? "2px solid #000"
-                  : "1px solid #B4B4B4",
-            }}
-          ></div>
-        </div>
-        <div
-          className="flip-card-back"
-          style={{
-            border:
-              props.selectedpiechart === "selected"
-                ? "2px solid #000"
-                : "1px solid #B4B4B4",
-          }}
-        >
-          <props.flipcard_description />
-        </div>
-      </div>
-    </div>
-  </label>
-  
-  );
-}
-export default PieChartDials;
-
-"""
-I searched IPictureSetting where i found the tooltip is not supported to hover on image .
-consider above code 
-where i created titleContainer where i am showing  text: `${props.title}` and image as in single row. and trying to show tooltip on hover on image. but i got failed.
-can we tried another way .
-like for only that section can we created html using div and show title and image in single row . where tooltip is displayed on hover of image . and then that div we used in chart . 
-can we do this or achieve this?
-please provide me updated code
