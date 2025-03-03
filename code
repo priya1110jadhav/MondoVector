@@ -1,31 +1,19 @@
-.tooltip {
-  visibility: hidden;
-  z-index: 9999 !important;
-  width: 192px;
-  height: 44px;
-  gap: 10px;
-  border-radius: 8px;
-  padding: 12px 14px;
-  background: #000000;
-  color: #F8F8F8;
-  font-family: "kenvue-sans-regular",sans-serif;
-  font-weight: 400;
-  font-size: 13.33px;
-  line-height: 19.99px;
-  letter-spacing: 0%;
-  position: absolute;
-  bottom: 74%;
-  left: 70%;
-  transform: translateX(-50%);
-  transition: visibility 0s, opacity 0.2s ease;
-  opacity: 0;
-}
-this is my tooltip but  i want to design as it will show as notch at botttom in center i will show you as following
-i created it using the keyboard for showing you how it will look 
-in bottom middle we need a 'V' shape . hopw you understood please shape above tooltip
+const handleCardClick = async (row: ExperimentalDataItem) => {
+    
+    await TrackGoogleAnalyticsEvent("PAGE_VIEW", "Product Detail", {
+      loginUserName,
+      PAGE_VIEW: `/product-detail/${row._id}`,
+    });
 
- ______________________
-|                      |
-|___________  _________|
-            \/
 
+    // Navigate to product detail page
+    navigate(`/product-detail/${row._id}`, { state: { row } });
+  };
+
+
+I am working SPA application using react.
+when i am on one page and scroll down where my some cards are placed where each card user is able to click and when he click user navigate on that selected product detailed page.
+but the issue is when thing i am scrolling down down and clicking on cards . when user navigate on product detailed page then it should be page started from top.
+but its spa application thats why where user clicks it navigate on same position on screen .
+it should be navigate on top of another screen
+how i achieve this. hope you get it?
