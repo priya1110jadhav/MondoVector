@@ -1,19 +1,28 @@
-const handleCardClick = async (row: ExperimentalDataItem) => {
-    
-    await TrackGoogleAnalyticsEvent("PAGE_VIEW", "Product Detail", {
-      loginUserName,
-      PAGE_VIEW: `/product-detail/${row._id}`,
-    });
+export const ProductAssessmentDetailsPage:React.FC = () => {
+    const param = useParams();
+    const { data:sipDataReponse, refetch } = useGetAssessmentDetailBySipID(param.assessmentId);
+    const assessmentData = useMemo(()=>{
+      let sipData = {
+        assessmentId: "",
+        productId:"",
+        assessmentType:""
+      }
+      if(sipDataReponse){
+        sipData = sipDataReponse[0];
+      }
+      return {
+        assessmentId:sipData?.assessmentId,
+        productId:sipData?.productId,
+        type: sipData?.assessmentType
+      };
+    }, [sipDataReponse])
+  
 
-
-    // Navigate to product detail page
-    navigate(`/product-detail/${row._id}`, { state: { row } });
-  };
-
-
-I am working SPA application using react.
-when i am on one page and scroll down where my some cards are placed where each card user is able to click and when he click user navigate on that selected product detailed page.
-but the issue is when thing i am scrolling down down and clicking on cards . when user navigate on product detailed page then it should be page started from top.
-but its spa application thats why where user clicks it navigate on same position on screen .
-it should be navigate on top of another screen
-how i achieve this. hope you get it?
+     React.useEffect(() => {
+        // Scroll to the top of the page when the component mounts
+        window.scrollTo(0, 0);
+     }, []);
+  
+    useEffect(()=>{
+      refetch();
+    },[refetch,param.assessmentId])
