@@ -1,19 +1,65 @@
-C:\Users\apatil35\node_modules\@playwright\browser-chromium
-npm ERR! command failed
-npm ERR! command C:\WINDOWS\system32\cmd.exe /d /s /c node install.js
-npm ERR! Downloading Chromium 119.0.6045.9 (playwright build v1084) from https://playwright.azureedge.net/builds/chromium/1084/chromium-win64.zip
-npm ERR! Downloading Chromium 119.0.6045.9 (playwright build v1084) from https://playwright-akamai.azureedge.net/builds/chromium/1084/chromium-win64.zip
-npm ERR! Downloading Chromium 119.0.6045.9 (playwright build v1084) from https://playwright-verizon.azureedge.net/builds/chromium/1084/chromium-win64.zip
-npm ERR! Error: unable to get local issuer certificate
-npm ERR!     at TLSSocket.onConnectSecure (node:_tls_wrap:1540:34)
-npm ERR!     at TLSSocket.emit (node:events:513:28)
-npm ERR!     at TLSSocket._finishInit (node:_tls_wrap:959:8)
-npm ERR!     at ssl.onhandshakedone (node:_tls_wrap:743:12) {
-npm ERR!   code: 'UNABLE_TO_GET_ISSUER_CERT_LOCALLY'
-npm ERR! }
-npm ERR! Error: unable to get local issuer certificate
-npm ERR!     at TLSSocket.onConnectSecure (node:_tls_wrap:1540:34)
-npm ERR!     at TLSSocket.emit (node:events:513:28)
-npm ERR!     at TLSSocket._finishInit (node:_tls_wrap:959:8)
-npm ERR!     at ssl.onhandshakedone (node:_tls_wrap:743:12) {
-npm ERR!   code: 'UNABLE_TO_GET_ISSUER_CERT_LOCALLY'
+ const [outerSort, setOuterSort] = useState<{
+    orderBy: keyof Component | keyof IGreenChemFormulationData;
+    order: 'asc' | 'desc';
+  }>({
+    order: 'asc',
+    orderBy: 'componentName'
+  });
+
+  const [innerSort, setInnerSort] = useState<{ orderBy: keyof ComponentDetail, order: 'asc' | 'desc' }>({
+    order: 'asc',
+    orderBy: 'materialName'
+  })
+
+  const toggleRow = (id: number) => {
+    setOpenRows((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+  const headerColumns = getHeaderColumns(props.currentTab);
+  const headerColumns2 = getHeaderColumns2(props.currentTab);
+
+  const handleOuterSort = (property: keyof Component | keyof IGreenChemFormulationData) => {
+    console.log(`Sorting by: ${property}`);
+    if (["baseLineComponentWeight", "myProductComponentWeight", "myProductComponentWeightDose",
+      "baselineComponentWeightDose", "rawMaterialTradeName", "rawCode",
+      "baselineComponentPCRContent", "myProductComponentPCRContent",
+      "baselineWeight", "baselineOrganic", "baselineRenewable",
+      "myProductWeight", "myProductOrganic", "myProductRenewable"].includes(property)) {
+      setOpenRows({});
+    }
+    setOuterSort((prevSort) => {
+      const isAsc = prevSort.orderBy === property && prevSort.order === 'asc';
+      return { orderBy: property, order: isAsc ? 'desc' : 'asc' };
+    });
+  }
+
+  const handleInnerSort = (property: keyof ComponentDetail) => {
+    setInnerSort((prevSort) => {
+      const isAsc = prevSort.orderBy === property && prevSort.order === 'asc';
+      return { orderBy: property, order: isAsc ? 'desc' : 'asc' };
+    });
+  }
+
+  const handleSortingRequest = (property: keyof Component | keyof ComponentDetail | keyof IGreenChemFormulationData) => {
+
+    if (property === 'componentName' || property === "baseLineComponentWeight" || property === "myProductComponentWeight" || property === "myProductComponentWeightDose" || property === "baselineComponentWeightDose" || property === "rawMaterialTradeName"
+      || property === "rawCode"
+      || property === "baselineComponentPCRContent"
+      || property === "myProductComponentPCRContent"
+      || property === "baselineWeight"
+      || property === "baselineOrganic"
+      || property === "baselineRenewable"
+      || property === "myProductWeight"
+      || property === "myProductOrganic"
+      || property === "myProductRenewable") {
+      handleOuterSort(property)
+    
+    } else if (property === 'materialName' || property === "materialType") {
+      handleInnerSort(property);
+    }
+  }
+
+
+when i click on any one sorting icon in header then the direction of sorting icon is changed only for that particular header 
+but in my case when i click on rawMaterialTradeName header sorting icon then all others headers sorting icon is changed there position 
+it missbehaves.
+instead of this only that sort icon is changed where i click . others heasers sorting icons stays as it is . nothing changed its position
