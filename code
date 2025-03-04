@@ -1,65 +1,104 @@
- const [outerSort, setOuterSort] = useState<{
-    orderBy: keyof Component | keyof IGreenChemFormulationData;
-    order: 'asc' | 'desc';
-  }>({
-    order: 'asc',
-    orderBy: 'componentName'
-  });
-
-  const [innerSort, setInnerSort] = useState<{ orderBy: keyof ComponentDetail, order: 'asc' | 'desc' }>({
-    order: 'asc',
-    orderBy: 'materialName'
-  })
-
-  const toggleRow = (id: number) => {
-    setOpenRows((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
-  const headerColumns = getHeaderColumns(props.currentTab);
-  const headerColumns2 = getHeaderColumns2(props.currentTab);
-
-  const handleOuterSort = (property: keyof Component | keyof IGreenChemFormulationData) => {
-    console.log(`Sorting by: ${property}`);
-    if (["baseLineComponentWeight", "myProductComponentWeight", "myProductComponentWeightDose",
-      "baselineComponentWeightDose", "rawMaterialTradeName", "rawCode",
-      "baselineComponentPCRContent", "myProductComponentPCRContent",
-      "baselineWeight", "baselineOrganic", "baselineRenewable",
-      "myProductWeight", "myProductOrganic", "myProductRenewable"].includes(property)) {
-      setOpenRows({});
-    }
-    setOuterSort((prevSort) => {
-      const isAsc = prevSort.orderBy === property && prevSort.order === 'asc';
-      return { orderBy: property, order: isAsc ? 'desc' : 'asc' };
-    });
-  }
-
-  const handleInnerSort = (property: keyof ComponentDetail) => {
-    setInnerSort((prevSort) => {
-      const isAsc = prevSort.orderBy === property && prevSort.order === 'asc';
-      return { orderBy: property, order: isAsc ? 'desc' : 'asc' };
-    });
-  }
-
-  const handleSortingRequest = (property: keyof Component | keyof ComponentDetail | keyof IGreenChemFormulationData) => {
-
-    if (property === 'componentName' || property === "baseLineComponentWeight" || property === "myProductComponentWeight" || property === "myProductComponentWeightDose" || property === "baselineComponentWeightDose" || property === "rawMaterialTradeName"
-      || property === "rawCode"
-      || property === "baselineComponentPCRContent"
-      || property === "myProductComponentPCRContent"
-      || property === "baselineWeight"
-      || property === "baselineOrganic"
-      || property === "baselineRenewable"
-      || property === "myProductWeight"
-      || property === "myProductOrganic"
-      || property === "myProductRenewable") {
-      handleOuterSort(property)
-    
-    } else if (property === 'materialName' || property === "materialType") {
+ const handleSortingRequest = (property: keyof Component | keyof ComponentDetail | keyof IGreenChemFormulationData) => {
+    if (Object.keys(outerSort).includes(property as string)) {
+      handleOuterSort(property);
+    } else if (Object.keys(innerSort).includes(property as string)) {
       handleInnerSort(property);
     }
-  }
+  };
+getting error on property as 
+Argument of type '"componentName" | "baseLineComponentWeight" | "myProductComponentWeight" | "myProductComponentWeightDose" | "baselineComponentWeightDose" | "rawMaterialTradeName" | "rawCode" | ... 27 more ... | "myProductMaterialPCRContent"' is not assignable to parameter of type '"componentName" | "baseLineComponentWeight" | "myProductComponentWeight" | "myProductComponentWeightDose" | "baselineComponentWeightDose" | "rawMaterialTradeName" | "rawCode" | ... 15 more ... | "myProdGaia"'.
+  Type '"materialName"' is not assignable to type '"componentName" | "baseLineComponentWeight" | "myProductComponentWeight" | "myProductComponentWeightDose" | "baselineComponentWeightDose" | "rawMaterialTradeName" | "rawCode" | ... 15 more ... | "myProdGaia"'.ts(2345)
+const SortableTableHeader: React.FC<SortableTableHeaderProps> = ({
+  order,
+  orderBy,
+  onRequestSort,
+  column,
+}) => {
+  const {
+    id,
+    label,
+    align,
+    colSpan = 1,
+    rowSpan = 1,
+    width,
+    minwidth,
+    height,
+    justifyContent = 'left',
+    tooltipMessage,
+    padding,
+  } = column;
 
+  const handleSort = () => {
+    onRequestSort(id);
+  };
 
-when i click on any one sorting icon in header then the direction of sorting icon is changed only for that particular header 
-but in my case when i click on rawMaterialTradeName header sorting icon then all others headers sorting icon is changed there position 
-it missbehaves.
-instead of this only that sort icon is changed where i click . others heasers sorting icons stays as it is . nothing changed its position
+  return (
+    <TableCell
+      align={align}
+      colSpan={colSpan}
+      rowSpan={rowSpan}
+      sx={{
+        position: "sticky",
+        height: height ?? "96px",
+        width: width,
+        minWidth: minwidth,
+        padding: padding ?? "12px 20px",
+        border: "1px solid #E4E7EC",
+        backgroundColor: "#F8F8F8",
+        tableLayout: 'fixed'
+
+      }}
+    >
+      <Box display="flex" alignItems="center" justifyContent={justifyContent}>
+
+        <span style={{ whiteSpace: "nowrap" }}>{label}</span>
+        {tooltipMessage && (
+          <Tooltip title={tooltipMessage}>
+            <IconButton size="small" className="info-icon" sx={{ ml: 1 }}>
+              <InfoIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        )}
+        <TableSortLabel
+          active={orderBy === id}
+          direction={order}
+          onClick={handleSort}
+          sx={{
+            "&.Mui-active": {
+              color: "theme.palette.primary.main",
+              fontWeight: "bold",
+            },
+            "& .MuiTableSortLabel-icon": {
+              opacity: 0.3,
+              transition: "opacity 0.3s",
+            },
+            "&:hover .MuiTableSortLabel-icon": {
+              opacity: 1,
+            },
+          }}
+        >
+        </TableSortLabel>
+      </Box>
+    </TableCell>
+  );
+};
+ <SortableTableHeader
+
+                  key={column.id}
+
+                  order={sortConfig.order}
+
+                  orderBy={sortConfig.orderBy}
+
+                  onRequestSort={handleSortingRequest}
+
+                  column={column}
+
+                />
+
+Type '{ order: "asc" | "desc"; }' is not assignable to type '"asc" | "desc"'.ts(2322)
+structure.ts(54, 3): The expected type comes from property 'order' which is declared here on type 'IntrinsicAttributes & SortableTableHeaderProps'
+Type '{ order: "asc" | "desc"; }' is not assignable to type 'DetailData'.ts(2322)
+structure.ts(55, 3): The expected type comes from property 'orderBy' which is declared here on type 'IntrinsicAttributes & SortableTableHeaderProps'
+
+when i add your changes then i got the errors as above
