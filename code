@@ -1,28 +1,19 @@
-export const ProductAssessmentDetailsPage:React.FC = () => {
-    const param = useParams();
-    const { data:sipDataReponse, refetch } = useGetAssessmentDetailBySipID(param.assessmentId);
-    const assessmentData = useMemo(()=>{
-      let sipData = {
-        assessmentId: "",
-        productId:"",
-        assessmentType:""
-      }
-      if(sipDataReponse){
-        sipData = sipDataReponse[0];
-      }
-      return {
-        assessmentId:sipData?.assessmentId,
-        productId:sipData?.productId,
-        type: sipData?.assessmentType
-      };
-    }, [sipDataReponse])
-  
-
-     React.useEffect(() => {
-        // Scroll to the top of the page when the component mounts
-        window.scrollTo(0, 0);
-     }, []);
-  
-    useEffect(()=>{
-      refetch();
-    },[refetch,param.assessmentId])
+C:\Users\apatil35\node_modules\@playwright\browser-chromium
+npm ERR! command failed
+npm ERR! command C:\WINDOWS\system32\cmd.exe /d /s /c node install.js
+npm ERR! Downloading Chromium 119.0.6045.9 (playwright build v1084) from https://playwright.azureedge.net/builds/chromium/1084/chromium-win64.zip
+npm ERR! Downloading Chromium 119.0.6045.9 (playwright build v1084) from https://playwright-akamai.azureedge.net/builds/chromium/1084/chromium-win64.zip
+npm ERR! Downloading Chromium 119.0.6045.9 (playwright build v1084) from https://playwright-verizon.azureedge.net/builds/chromium/1084/chromium-win64.zip
+npm ERR! Error: unable to get local issuer certificate
+npm ERR!     at TLSSocket.onConnectSecure (node:_tls_wrap:1540:34)
+npm ERR!     at TLSSocket.emit (node:events:513:28)
+npm ERR!     at TLSSocket._finishInit (node:_tls_wrap:959:8)
+npm ERR!     at ssl.onhandshakedone (node:_tls_wrap:743:12) {
+npm ERR!   code: 'UNABLE_TO_GET_ISSUER_CERT_LOCALLY'
+npm ERR! }
+npm ERR! Error: unable to get local issuer certificate
+npm ERR!     at TLSSocket.onConnectSecure (node:_tls_wrap:1540:34)
+npm ERR!     at TLSSocket.emit (node:events:513:28)
+npm ERR!     at TLSSocket._finishInit (node:_tls_wrap:959:8)
+npm ERR!     at ssl.onhandshakedone (node:_tls_wrap:743:12) {
+npm ERR!   code: 'UNABLE_TO_GET_ISSUER_CERT_LOCALLY'
