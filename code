@@ -1,12 +1,268 @@
-followin is my stages of jenkins pipeline
-Start -passed
-Checkout -passed
-Manifest Load -passed
-Setup -passed
-Validate -passed
-Lint -passed
-Version Calculation -passed
-Static Analysis -failed
+# Pipeline details across environments (defaults)
+common:
+  pipelineType: app-dev
+  debug: true
+  helm:
+    chartRepo: javz-helm-charts
+    chartName: rise-visualization-mf
 
-but why it got failed?how to check why this is failed and how to make it as passed
 
+  versionFileUpdates:
+    - type: yaml
+      file: _scm_helm/Chart.yaml
+      path: version
+    - type: yaml
+      file: _scm_helm/values.yaml
+      path: image.tag
+  assembleForPackage:
+    type: npm
+    enabled: true
+    credentialsId: jnj-eat-artifactory-build
+    dir: project
+    installCommand: npm install
+    persistStash: true
+  versionCalculation:
+    enabled: true
+    type: gitversion
+
+
+  unitTest:
+    enabled: false
+
+
+  lint:
+    enabled: false
+
+
+  staticAnalysis:
+    enabled: false
+    type: multi
+    stages:
+      sonar:
+        enabled: false
+        type: sonar
+        shortLivedAnalysis: false
+        longLivedAnalysis: false
+        shortLivedBuildResults:
+          BLOCKER:
+            FAILURE: 0
+          CRITICAL:
+            FAILURE: 50
+          IGNORE:
+            MAJOR: true
+            MINOR: true
+            INFO: true
+          QUALITY_GATE:
+            ERROR: FAILURE
+            WARN: SUCCESS
+        longLivedBuildResults:
+          BLOCKER:
+            FAILURE: 0
+          CRITICAL:
+            FAILURE: 50
+          IGNORE:
+            MAJOR: true
+            MINOR: true
+            INFO: true
+          QUALITY_GATE:
+            ERROR: UNSTABLE
+            WARN: SUCCESS
+
+
+  package:
+    enabled: false
+    type: multi
+    stages:
+      Helm:
+        type: helm
+        enabled: false
+        chartRepo: javz-helm-charts
+        chartName: rise-visualization-mf
+        versionFileUpdates:
+          - type: yaml
+            file: _scm_helm/Chart.yaml
+            path: version
+          - type: yaml
+            file: _scm_helm/values.yaml
+            path: image.tag
+      tar-package:
+        type: tar.gz
+        enabled: false
+        name: visualization-mf
+        packageDir: ./
+
+
+  publish:
+    enabled: false
+    type: "multi"
+    stages:
+      artifactory-spec:
+        enabled: false
+        type: artifactory-spec
+        target: javz-docker/visualization-mf/
+        fileName: visualization-mf-*.tar.gz
+      Helm:
+        enabled: false
+        type: helm
+        chartRepo: javz-helm-charts
+        chartName: rise-visualization-mf
+      Docker:
+        enabled: false
+        type: docker
+        credsList:
+          - registry: https://jnj.artifactrepo.jnj.com
+            credentialsId: jnj-eat-artifactory
+          - registry: https://javz-docker.artifactrepo.jnj.com
+            credentialsId: sourcecode-bitbucket
+
+
+  buildAnalysis:
+    enabled: false
+    xrayFailBuild: false
+
+
+  buildAnnouncements:
+    enabled: true
+    destinations:
+      team-emails:
+        type: email
+        format: buildstate
+        recipients: [DL-RISE-Monitoring@its.jnj.com]
+        startEnabled: false
+        successEnabled: true
+        unstableEnabled: true
+        failureEnabled: true
+        jobTriggers: []
+
+
+  deploy:
+    enabled: true
+    type: "multi"
+    parallel: "false"
+    stages:
+      # appDeployment section deploys the published helm chart to kubernetes cluster
+      appDeployment:
+        enabled: false
+        type: helm
+        name: rise-visualization-mf
+        createNamespace: true
+        chartRepoCredentialsId: "sourcecode-bitbucket"
+        atomic: true
+        kubernetesConfig:
+          type: eks
+          name: itx-bvx-rise-test
+          region: us-east-1
+          credentialsId: "itx-bvx-eatjenkinsadminapi"
+
+
+  resolveArtifacts:
+    enabled: false
+
+
+environments:
+
+
+  
+  DEV:
+    cmdb:
+      appid: APP000010043717
+      deploymentEnvironment: development
+    versionCalculation:
+      patternType: jnj-developer-branch
+    unitTest:
+      enabled: false
+      dir: "project"
+      type: npm
+      coverageReportFile: jest/coverage/lcov.info
+    lint:
+      enabled: true
+      dir: "project"
+      type: npm
+    staticAnalysis:
+      enabled: false
+      type: multi
+      stages:
+        sonar:
+          enabled: false
+          type: sonar
+          shortLivedAnalysis: false
+          longLivedAnalysis: false
+          shortLivedBuildResults:
+            BLOCKER:
+              FAILURE: 0
+            CRITICAL:
+              FAILURE: 50
+            IGNORE:
+              MAJOR: true
+              MINOR: true
+              INFO: true
+            QUALITY_GATE:
+              ERROR: FAILURE
+              WARN: SUCCESS
+          longLivedBuildResults:
+            BLOCKER:
+              FAILURE: 0
+            CRITICAL:
+              FAILURE: 50
+            IGNORE:
+              MAJOR: true
+              MINOR: true
+              INFO: true
+            QUALITY_GATE:
+              ERROR: FAILURE
+              WARN: SUCCESS
+    assembleForPackage:
+      enabled: false
+      command: npm run build:dev
+    package:
+      enabled: true
+      type: multi
+      stages:
+        Helm:
+          enabled: true
+          type: helm
+        tar-package:
+          type: tar.gz
+          enabled: true
+    publish:
+      enabled: false
+      type: multi
+      stages:
+        artifactory-spec:
+          enabled: true
+          type: artifactory-spec
+        Helm:
+          enabled: true
+          type: helm
+        Docker:
+          enabled: true
+          type: docker
+          tagStrategy: dev
+    deploy:
+      enabled: true
+      type: multi
+      stages:
+        appDeployment:
+          enabled: true
+          type: helm
+          name: rise-visualization-mf
+          namespace: rise-dev
+          configFiles:
+            - repo: https://sourcecode.jnj.com/scm/asx-javz/visualization-mf.git
+              repoCredentialsId: "sourcecode-bitbucket"
+              files:
+                - file: _scm_config/dev.values.yaml
+                  type: plaintext
+                - file: _scm_config/common.values.yaml
+                  type: plaintext
+          dryRun: false
+          kubernetesConfig:
+            type: eks
+            region: us-east-1
+            credentialsId: "itx-bvx-eatjenkinsadminapi"
+            name: itx-bvx-rise-test
+          atomic: false
+  
+  
+  Now in publich stage my pipeline is failed.
+how to make as passed?
