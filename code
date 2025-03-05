@@ -1,104 +1,221 @@
- const handleSortingRequest = (property: keyof Component | keyof ComponentDetail | keyof IGreenChemFormulationData) => {
-    if (Object.keys(outerSort).includes(property as string)) {
-      handleOuterSort(property);
-    } else if (Object.keys(innerSort).includes(property as string)) {
-      handleInnerSort(property);
-    }
-  };
-getting error on property as 
-Argument of type '"componentName" | "baseLineComponentWeight" | "myProductComponentWeight" | "myProductComponentWeightDose" | "baselineComponentWeightDose" | "rawMaterialTradeName" | "rawCode" | ... 27 more ... | "myProductMaterialPCRContent"' is not assignable to parameter of type '"componentName" | "baseLineComponentWeight" | "myProductComponentWeight" | "myProductComponentWeightDose" | "baselineComponentWeightDose" | "rawMaterialTradeName" | "rawCode" | ... 15 more ... | "myProdGaia"'.
-  Type '"materialName"' is not assignable to type '"componentName" | "baseLineComponentWeight" | "myProductComponentWeight" | "myProductComponentWeightDose" | "baselineComponentWeightDose" | "rawMaterialTradeName" | "rawCode" | ... 15 more ... | "myProdGaia"'.ts(2345)
-const SortableTableHeader: React.FC<SortableTableHeaderProps> = ({
-  order,
-  orderBy,
-  onRequestSort,
-  column,
-}) => {
-  const {
-    id,
-    label,
-    align,
-    colSpan = 1,
-    rowSpan = 1,
-    width,
-    minwidth,
-    height,
-    justifyContent = 'left',
-    tooltipMessage,
-    padding,
-  } = column;
+ FAIL  src/component/__tests__/Navbar.test.js
+  ● Test suite failed to run
 
-  const handleSort = () => {
-    onRequestSort(id);
-  };
 
-  return (
-    <TableCell
-      align={align}
-      colSpan={colSpan}
-      rowSpan={rowSpan}
-      sx={{
-        position: "sticky",
-        height: height ?? "96px",
-        width: width,
-        minWidth: minwidth,
-        padding: padding ?? "12px 20px",
-        border: "1px solid #E4E7EC",
-        backgroundColor: "#F8F8F8",
-        tableLayout: 'fixed'
+    Jest encountered an unexpected token
 
-      }}
-    >
-      <Box display="flex" alignItems="center" justifyContent={justifyContent}>
 
-        <span style={{ whiteSpace: "nowrap" }}>{label}</span>
-        {tooltipMessage && (
-          <Tooltip title={tooltipMessage}>
-            <IconButton size="small" className="info-icon" sx={{ ml: 1 }}>
-              <InfoIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        )}
-        <TableSortLabel
-          active={orderBy === id}
-          direction={order}
-          onClick={handleSort}
-          sx={{
-            "&.Mui-active": {
-              color: "theme.palette.primary.main",
-              fontWeight: "bold",
-            },
-            "& .MuiTableSortLabel-icon": {
-              opacity: 0.3,
-              transition: "opacity 0.3s",
-            },
-            "&:hover .MuiTableSortLabel-icon": {
-              opacity: 1,
-            },
-          }}
-        >
-        </TableSortLabel>
-      </Box>
-    </TableCell>
-  );
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+
+    By default "node_modules" folder is ignored by transformers.
+
+
+    Here's what you can do:
+     • If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.       
+     • If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript
+     • To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config.
+     • If you need a custom transformation specify a "transform" option in your config.
+     • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+
+
+    You'll find more details and examples of these config options in the docs:
+    https://jestjs.io/docs/configuration
+    For information about custom transformations, see:
+    https://jestjs.io/docs/code-transformation
+
+
+    Details:
+
+
+    C:\Users\PJadha29\Documents\updated e2e\visualization-mf\src\setupTests.mjs:5
+    import '@testing-library/jest-dom';
+    ^^^^^^
+
+
+    SyntaxError: Cannot use import statement outside a module
+
+
+      at Runtime.createScriptFromCode (../node_modules/jest-runtime/build/index.js:1505:14)
+above error i am getting in my javascript react application while running test cases 
+follwoing are my configuration files
+package.json
+"""
+{
+  "name": "visualization-mf",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.2",
+    "@mui/material": "^5.15.2",
+    "@mui/x-tree-view": "^6.17.0",
+    "@testing-library/user-event": "^13.5.0",
+    "ag-grid-react": "^33.0.4",
+    "axios": "^1.6.7",
+    "chart.js": "^4.4.1",
+    "cross-env": "^7.0.3",
+    "date-fns": "^3.3.1",
+    "dayjs": "^1.11.10",
+    "jointjs": "^3.7.7",
+    "luxon": "^3.5.0",
+    "moment": "^2.30.1",
+    "papaparse": "^5.4.1",
+    "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-csv": "^2.2.2",
+    "react-date-range": "^2.0.0-alpha.4",
+    "react-datepicker": "^6.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^5.4.0",
+    "react-router-dom": "^7.2.0",
+    "react-scripts": "5.0.1",
+    "react-slick": "^0.30.3",
+    "react-spinners": "^0.15.0",
+    "rsuite": "^5.49.0",
+    "sass": "^1.83.4",
+    "slick-carousel": "^1.8.1",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "lint": "eslint src --ext js,ts,tsx",
+    "test": "cross-env BABEL_ENV=test jest --forceExit --runInBand --coverage",
+    "coverage": "cross-env BABEL_ENV=test jest --forceExit --runInBand --coverage",
+    "build": "react-scripts build",
+    "build:dev": "GENERATE_SOURCEMAP=false CI=false env-cmd -f .env.dev react-scripts --openssl-legacy-provider build",
+    "build:prod": "GENERATE_SOURCEMAP=false CI=false env-cmd -f .env.prod react-scripts --openssl-legacy-provider build",
+    "build:qa": "GENERATE_SOURCEMAP=false CI=false env-cmd -f .env.qa react-scripts --openssl-legacy-provider build",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.9",
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-react": "^7.26.3",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.13.2",
+    "babel-jest": "^29.7.0",
+    "eslint": "^8.57.1",
+    "eslint-plugin-react-refresh": "^0.4.18",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jest-transform-stub": "^2.0.0",
+    "ts-jest": "^29.2.6"
+  }
+}
+
+
+"""
+tsConfig.json
+"""
+{
+    "compilerOptions": {
+      "target": "es5",                          // Specify ECMAScript target version
+      "lib": ["dom", "dom.iterable", "esnext"], // Include library files for DOM and ECMAScript
+      "allowJs": true,                           // Allow JavaScript files to be compiled
+      "skipLibCheck": true,                      // Skip type checking of declaration files
+      "strict": true,                            // Enable all strict type-checking options
+      "forceConsistentCasingInFileNames": true, // Disallow inconsistently named files
+      "noEmit": true,                            // Do not emit output files
+      "esModuleInterop": true,                   // Enables emit interoperability between CommonJS and ES modules
+      "module": "esnext",                        // Specify module code generation
+      "moduleResolution": "node",                // Specify how modules get resolved
+      "resolveJsonModule": true,                 // Adds support for importing JSON modules
+      "isolatedModules": true                     // Ensure that each file can be transpiled independently
+    },
+    "include": ["src"]                           // Specify the folder containing your source code
+  }
+"""
+jest.config.cjs
+"""
+module.exports = {
+  rootDir: "src",
+  testEnvironment: 'jsdom',
+  transform: {
+    '^.+\\.(js|jsx)$': 'babel-jest', 
+    ".+\\.(svg|css|styl|less|sass|scss|png|jpg|gif|ttf|woff|woff2)$": "jest-transform-stub",
+  },
+  transformIgnorePatterns: [
+    'node_modules/(?!(jest-)?@?babel|@?jest|@?react|@?mui|@?material-ui|@?testing-library|@?emotion|@?ag-grid|@?axios|@?date-fns|@?dotenv)',
+  ],
+  moduleNameMapper: {
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    "single-spa-react/parcel": "single-spa-react/lib/cjs/parcel.cjs",
+    "@consumer/core-login-ui-mf": "<rootDir>/mocks/CoreLogin.mock.js",
+    "./vite.svg": "<rootDir>/mocks/ViteSvgMocks.js",
+    "^react-router-dom$": "<rootDir>/node_modules/react-router-dom",
+  },
+  setupFilesAfterEnv: [
+    '<rootDir>/setupTests.mjs'
+  ],
 };
- <SortableTableHeader
-
-                  key={column.id}
-
-                  order={sortConfig.order}
-
-                  orderBy={sortConfig.orderBy}
-
-                  onRequestSort={handleSortingRequest}
-
-                  column={column}
-
-                />
-
-Type '{ order: "asc" | "desc"; }' is not assignable to type '"asc" | "desc"'.ts(2322)
-structure.ts(54, 3): The expected type comes from property 'order' which is declared here on type 'IntrinsicAttributes & SortableTableHeaderProps'
-Type '{ order: "asc" | "desc"; }' is not assignable to type 'DetailData'.ts(2322)
-structure.ts(55, 3): The expected type comes from property 'orderBy' which is declared here on type 'IntrinsicAttributes & SortableTableHeaderProps'
-
-when i add your changes then i got the errors as above
+"""
+babel.config.json
+"""
+{
+  "presets": [
+    "@babel/preset-env",
+    [
+      "@babel/preset-react",
+      {
+        "runtime": "automatic"
+      }
+    ]
+  ],
+  "plugins": [
+    [
+      "@babel/plugin-transform-runtime",
+      {
+        "useESModules": true,
+        "regenerator": false
+      }
+    ]
+  ],
+  "env": {
+    "test": {
+      "presets": [
+        [
+          "@babel/preset-env",
+          {
+            "targets": "current node"
+          }
+        ]
+      ]
+    }
+  }
+}
+"""
+setupTests.mjs
+"""
+// jest-dom adds custom jest matchers for asserting on DOM nodes.
+// allows you to do things like:
+// expect(element).toHaveTextContent(/react/i)
+// learn more: https://github.com/testing-library/jest-dom
+import '@testing-library/jest-dom';
+"""
+why i am getting issue while running the test cases. am used jest 
