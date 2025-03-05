@@ -1,107 +1,12 @@
-Navbar.js as followimng
-"""
-import React from 'react';
-import { NavLink ,useNavigate} from 'react-router-dom';
-import logo from '../assets/JnJLogo2.png';
-import home_icon from '../assets/home.png'; // Import the home icon image
-import about from '../assets/about.png';
-import { CardContent } from '@mui/material';
+followin is my stages of jenkins pipeline
+Start -passed
+Checkout -passed
+Manifest Load -passed
+Setup -passed
+Validate -passed
+Lint -passed
+Version Calculation -passed
+Static Analysis -failed
 
+but why it got failed?how to check why this is failed and how to make it as passed
 
-const Navbar = () => {
-  const navigate = useNavigate();
-  const handleAboutClick = () => {
-    
-    navigate('/about');
-  }; 
-
-
-  return (
-    <div className='navbar'>
-      <NavLink to="/">
-        <img src={logo} alt="" className='logo' />
-        <img src={home_icon} alt="Home" className='home-icon' /> {/* Home icon */}
-      </NavLink>
-      <ul>
-        <li>
-        <p className='dashboardName'>Back To Basics - DePuy Synthes MiTek & Joints Planning Reports</p>
-      
-        </li>
-       
-      </ul>
-      
-      
-      <div style={{display:'contents'}}>
-        <CardContent onClick={()=>handleAboutClick()} className='cardContentCustomcard'>
-         <img src={about} alt="" className='people'  />
-         </CardContent>
-       </div>
-    
-    </div>
-  );
-    };
-    
-export default Navbar;
-
-
-"""
-and its test file as following
-Navbar.test.js
-"""
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import Navbar from "../Navbar";
-import '@testing-library/jest-dom/extend-expect'; // for additional matchers
-
-
-test('initial text display', () => {
-    render(<Navbar />);
-    
-    // Check if the specific text is in the document
-    const dashboardNameElement = screen.getByText(/Back To Basics - DePuy Synthes MiTek & Joints Planning Reports/i);
-    expect(dashboardNameElement).toBeInTheDocument();
-});
-"""
-i am using jest running the test file but getting error as following
-"""
- FAIL  src/component/__tests__/Navbar.test.js
-  ● Test suite failed to run
-
-
-    Cannot find module 'react-router-dom' from 'src/component/Navbar.js'
-
-
-    Require stack:
-      src/component/Navbar.js
-      src/component/__tests__/Navbar.test.js
-
-
-      1 | import React from 'react';
-    > 2 | import { NavLink ,useNavigate} from 'react-router-dom';
-        | ^
-      3 | import logo from '../assets/JnJLogo2.png';
-      4 | import home_icon from '../assets/home.png'; // Import the home icon image
-      5 | import about from '../assets/about.png';
-
-
-      at Resolver.resolveModule (node_modules/jest-resolve/build/resolver.js:324:11)
-      at Object.<anonymous> (src/component/Navbar.js:2:1)
-      at Object.<anonymous> (src/component/__tests__/Navbar.test.js:3:1)
-      at TestScheduler.scheduleTests (node_modules/react-scripts/node_modules/@jest/core/build/TestScheduler.js:333:13)       
-      at runJest (node_modules/react-scripts/node_modules/@jest/core/build/runJest.js:404:19)
-
-
-----------------------|---------|----------|---------|---------|-------------------
-File                  | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                            
-----------------------|---------|----------|---------|---------|-------------------
-All files             |       0 |        0 |       0 |       0 | 
- component            |       0 |      100 |       0 |       0 | 
-  Navbar.js           |       0 |      100 |       0 |       0 | 8-31
- coverage/lcov-report |       0 |        0 |       0 |       0 | 
-  block-navigation.js |       0 |        0 |       0 |       0 | 2-87
-  prettify.js         |       0 |        0 |       0 |       0 | 2
-  sorter.js           |       0 |        0 |       0 |       0 | 2-196
-----------------------|---------|----------|---------|---------|-------------------
-Test Suites: 1 failed, 1 total
-"""
-how to resolve this errors?
